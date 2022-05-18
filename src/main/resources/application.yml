@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url:
-    username:
-    password:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: spzabt_zz380
     driver-class-name: org.postgresql.Driver
