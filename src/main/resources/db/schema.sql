@@ -1,6 +1,6 @@
 CREATE DATABASE mafia_db;
 
-CREATE TABLE "user"
+CREATE TABLE player
 (
     id          BIGSERIAL   NOT NULL PRIMARY KEY,
     name        VARCHAR(20) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE "user"
 CREATE TABLE lobby
 (
     id      BIGSERIAL NOT NULL PRIMARY KEY,
-    user_id INTEGER   NOT NULL REFERENCES "user" (id)
+    player_id INTEGER   NOT NULL REFERENCES player (id)
 );
 
 CREATE TABLE server_statistics
