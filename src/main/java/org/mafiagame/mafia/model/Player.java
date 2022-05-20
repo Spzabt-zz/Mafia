@@ -1,19 +1,23 @@
 package org.mafiagame.mafia.model;
 
-import org.springframework.data.annotation.Id;
-
 public class Player {
     private Integer id;
     private String name;
     private String role;
-    private Boolean gameStatus;
+    private Boolean alive;
+    private Integer position;
+    private Boolean candidate;
+    private Integer vote;
+    private Boolean admin;
+    private Integer lobbyId;
 
-    public Player(Integer id, String name, String role, Boolean gameStatus) {
-        this.id = id;
-        this.name = name;
-        this.role = role;
-        this.gameStatus = gameStatus;
-    }
+//    public static Player toModel(PlayerEntity entity) {
+//        Player model = new Player();
+//        model.setId(entity.getId());
+//        model.setName(entity.getName());
+//        model.setRole(entity.getRole());
+//        return model;
+//    }
 
     public Player() {
 
@@ -43,11 +47,66 @@ public class Player {
         this.role = role;
     }
 
-    public Boolean getGameStatus() {
-        return gameStatus;
+    public Boolean getAlive() {
+        return alive;
     }
 
-    public void setGameStatus(Boolean gameStatus) {
-        this.gameStatus = gameStatus;
+    public void setAlive(Boolean alive) {
+        this.alive = alive;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
+    public Boolean getCandidate() {
+        return candidate;
+    }
+
+    public void setCandidate(Boolean candidate) {
+        this.candidate = candidate;
+    }
+
+    public Integer getVote() {
+        return vote;
+    }
+
+    public void setVote(Integer vote) {
+        this.vote = vote;
+    }
+
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
+    }
+
+    public Integer getLobbyId() {
+        return lobbyId;
+    }
+
+    public void setLobbyId(Integer lobbyId) {
+        this.lobbyId = lobbyId;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", role='" + role + '\'' +
+                ", alive=" + alive +
+                ", position=" + position +
+                ", candidate=" + candidate +
+                ", vote=" + vote +
+                ", admin=" + admin +
+                ", lobbyId=" + lobbyId +
+                '}';
     }
 }

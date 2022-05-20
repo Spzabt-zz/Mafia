@@ -1,9 +1,13 @@
 package org.mafiagame.mafia.repository;
 
 import org.mafiagame.mafia.model.Player;
+import org.mafiagame.mafia.repository.mapper.PlayerRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class PlayerRepository {
@@ -14,8 +18,17 @@ public class PlayerRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void addPlayer(Player player) {
-        jdbcTemplate.update("insert into player (name, role, game_status) values (?, ?, ?);",
-                player.getName(), player.getRole(), player.getGameStatus());
+    public void add(Player player) {
+        jdbcTemplate.update("insert into player (name, role, alive, position, candidate, vote, admin, lobby_id) values (?, ?, ?, ?, ?, ?, ?, ?);",
+                player.getName(), player.getRole(), player.getAlive(), player.getPosition(), player.getCandidate(), player.getVote(), player.getAdmin(), player.getLobbyId());
+    }
+
+    public List<Player> players() {
+        List<Player> players = jdbcTemplate.query("SELECT * FROM player", new PlayerRowMapper()/*new BeanPropertyRowMapper<>(Player.class)*/);
+        return players;
+    }
+
+    public void delete(int id) {
+        jdbcTemplate.update("DELETE FROM player WHERE id=?", id);
     }
 }
