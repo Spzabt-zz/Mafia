@@ -1,5 +1,7 @@
 package org.mafiagame.mafia.model;
 
+import java.util.Objects;
+
 public class Votes {
     private Integer playerId;
     private Integer candidateId;
@@ -40,5 +42,18 @@ public class Votes {
                 ", candidateId=" + candidateId +
                 ", day=" + day +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Votes votes = (Votes) o;
+        return Objects.equals(playerId, votes.playerId) && Objects.equals(candidateId, votes.candidateId) && Objects.equals(day, votes.day);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(playerId, candidateId, day);
     }
 }

@@ -1,17 +1,27 @@
 package org.mafiagame.mafia.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.mafiagame.mafia.controller.dto.ConnectRequest;
+import org.mafiagame.mafia.exception.InvalidLobbyException;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.service.LobbyService;
-import org.mafiagame.mafia.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Lob;
+import java.util.List;
+
+import static org.springframework.http.ResponseEntity.ok;
+
 @RestController
+@Slf4j
 @RequestMapping("/v1")
 public class LobbyController {
     private final LobbyService lobbyService;
+    private SimpMessagingTemplate simpleMessageTemplate;
 
     @Autowired
     public LobbyController(LobbyService lobbyService) {
@@ -19,32 +29,43 @@ public class LobbyController {
     }
 
     @PostMapping("/lobby")
-    public ResponseEntity addLobby(@RequestBody Lobby lobby) {
+    public ResponseEntity<Lobby> addLobby(@RequestBody Player admin) {
         try {
-            lobbyService.addLobby(lobby);
-            return ResponseEntity.ok("Lobby added");
+            return ResponseEntity.ok(lobbyService.createGameLobby(admin));
         } catch (Exception e) {
-            //System.out.println(res);
-            return ResponseEntity.badRequest().body("Some error - " + e.getMessage());
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(lobbyService.createGameLobby(admin));
         }
     }
 
-    @PostMapping("/lobby/{number}/players")
-    public ResponseEntity connectUserToLobby(@PathVariable Integer number) {
+    @PostMapping("/lobby/{number}")
+    public ResponseEntity<Lobby> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException {
         try {
-            return ResponseEntity.ok("Player connected");
+            return ResponseEntity.ok(lobbyService.connectUserToLobby(connectRequest.getPlayer(), number));
         } catch (Exception e) {
-            //System.out.println(res);
-            return ResponseEntity.badRequest().body("Some error - " + e.getMessage());
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(lobbyService.connectUserToLobby(connectRequest.getPlayer(), number));
         }
     }
 
-   /* @GetMapping("/get")
-    public ResponseEntity getLobbies() {
+    @GetMapping("/lobbies")
+    public ResponseEntity<List<Lobby>> getLobbies() {
         try {
-            return ResponseEntity.ok("Everything is working!" + lobbyService.getLobbies());
+            log.info("Lobbies: {}", lobbyService.getLobbies());
+            return ResponseEntity.ok(lobbyService.getLobbies());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(lobbyService.getLobbies());
+        }
+    }
+
+    @DeleteMapping("/lobby/{id}")
+    public ResponseEntity deleteLobby(@PathVariable Integer id) {
+        try {
+            lobbyService.deleteLobby(id);
+            return ok("Lobby deleted!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Some error! " + e.getMessage());
         }
-    }*/
+    }
 }

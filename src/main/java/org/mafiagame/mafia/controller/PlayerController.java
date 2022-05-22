@@ -30,7 +30,7 @@ public class PlayerController {
     @GetMapping("/players")
     public ResponseEntity getPlayers() {
         try {
-            return ResponseEntity.ok("Everything is working!" + playerService.getPlayers());
+            return ResponseEntity.ok("Everything is working! " + playerService.getPlayers());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Some error! " + e.getMessage());
         }

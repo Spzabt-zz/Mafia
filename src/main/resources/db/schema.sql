@@ -1,21 +1,10 @@
 CREATE DATABASE mafia_db;
 
-CREATE TABLE player
-(
-    id   BIGSERIAL   NOT NULL PRIMARY KEY,
-    name VARCHAR(20) NOT NULL,
-    role VARCHAR(8)  NOT NULL
-);
-
 DROP DATABASE mafia_db;
-DROP TABLE player;
+DROP TABLE player CASCADE;
 DROP TABLE server_statistics;
-TRUNCATE TABLE player;
-
-SELECT *
-FROM player;
-
---insert into player (name, role) values ('dwad', 'mafia');
+TRUNCATE TABLE player RESTART IDENTITY;
+TRUNCATE TABLE lobby RESTART IDENTITY CASCADE;
 
 CREATE TABLE lobby
 (
@@ -26,15 +15,15 @@ CREATE TABLE lobby
 
 CREATE TABLE player
 (
-    id        BIGSERIAL   NOT NULL PRIMARY KEY,
-    name      VARCHAR(20) NOT NULL,
-    role      VARCHAR(8)  NOT NULL,
-    alive     BOOLEAN     NOT NULL,
-    position  INTEGER     NOT NULL,
-    candidate BOOLEAN     NOT NULL,
+    id        BIGSERIAL NOT NULL PRIMARY KEY,
+    name      VARCHAR(20),
+    role      VARCHAR(8),
+    alive     BOOLEAN,
+    position  INTEGER,
+    candidate BOOLEAN,
     vote      INTEGER,
-    admin     BOOLEAN     NOT NULL,
-    lobby_id  INTEGER     NOT NULL REFERENCES lobby (id)
+    admin     BOOLEAN,
+    lobby_id  INTEGER   NOT NULL REFERENCES lobby (id)
 );
 
 CREATE TABLE votes
@@ -50,3 +39,5 @@ CREATE TABLE server_statistics
     fair_win_count   INTEGER NOT NULL,
     total_game_count INTEGER NOT NULL
 );
+
+SELECT lb.* FROM lobby lb WHERE lb.number = 523141;

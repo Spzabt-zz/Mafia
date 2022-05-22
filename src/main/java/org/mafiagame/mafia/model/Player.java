@@ -1,5 +1,7 @@
 package org.mafiagame.mafia.model;
 
+import java.util.Objects;
+
 public class Player {
     private Integer id;
     private String name;
@@ -10,14 +12,6 @@ public class Player {
     private Integer vote;
     private Boolean admin;
     private Integer lobbyId;
-
-//    public static Player toModel(PlayerEntity entity) {
-//        Player model = new Player();
-//        model.setId(entity.getId());
-//        model.setName(entity.getName());
-//        model.setRole(entity.getRole());
-//        return model;
-//    }
 
     public Player() {
 
@@ -108,5 +102,18 @@ public class Player {
                 ", admin=" + admin +
                 ", lobbyId=" + lobbyId +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return Objects.equals(id, player.id) && Objects.equals(name, player.name) && Objects.equals(role, player.role) && Objects.equals(alive, player.alive) && Objects.equals(position, player.position) && Objects.equals(candidate, player.candidate) && Objects.equals(vote, player.vote) && Objects.equals(admin, player.admin) && Objects.equals(lobbyId, player.lobbyId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, role, alive, position, candidate, vote, admin, lobbyId);
     }
 }

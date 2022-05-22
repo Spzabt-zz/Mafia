@@ -3,7 +3,6 @@ package org.mafiagame.mafia.repository;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.repository.mapper.PlayerRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -24,8 +23,7 @@ public class PlayerRepository {
     }
 
     public List<Player> players() {
-        List<Player> players = jdbcTemplate.query("SELECT * FROM player", new PlayerRowMapper()/*new BeanPropertyRowMapper<>(Player.class)*/);
-        return players;
+        return jdbcTemplate.query("SELECT * FROM player", new PlayerRowMapper()/*new BeanPropertyRowMapper<>(Player.class)*/);
     }
 
     public void delete(int id) {
