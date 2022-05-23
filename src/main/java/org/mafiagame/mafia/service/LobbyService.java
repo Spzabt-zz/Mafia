@@ -18,6 +18,7 @@ import java.util.Random;
 
 @Service
 public class LobbyService {
+    private final int MAX_COUNT_PLAYERS_IN_LOBBY = 12;
     private final LobbyRepository lobbyRepository;
     private final PlayerRepository playerRepository;
 
@@ -64,6 +65,10 @@ public class LobbyService {
             throw new InvalidLobbyException("Game by number: " + number + " doesn't exist");
         }
         Lobby lobby = LobbyStorage.getInstance().getLobby().get(number);
+
+        if (lobby.getPlayers().size() > MAX_COUNT_PLAYERS_IN_LOBBY - 1) {
+            throw new InvalidLobbyException("Max players in lobby");
+        }
 
         Player player = new Player();
         player.setName(playerName);
