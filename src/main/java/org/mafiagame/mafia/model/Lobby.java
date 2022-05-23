@@ -6,10 +6,10 @@ import java.util.Objects;
 
 public class Lobby {
     private Integer id;
+    private String name;
     private Integer number;
     private Boolean gameStatus;
     private final List<Player> players;
-
     public Lobby() {
         players = new ArrayList<>();
     }
@@ -20,6 +20,14 @@ public class Lobby {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getNumber() {
@@ -50,8 +58,10 @@ public class Lobby {
     public String toString() {
         return "Lobby{" +
                 "id=" + id +
+                ", name='" + name + '\'' +
                 ", number=" + number +
                 ", gameStatus=" + gameStatus +
+                ", players=" + players +
                 '}';
     }
 
@@ -60,11 +70,11 @@ public class Lobby {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Lobby lobby = (Lobby) o;
-        return Objects.equals(id, lobby.id) && Objects.equals(number, lobby.number) && Objects.equals(gameStatus, lobby.gameStatus);
+        return Objects.equals(id, lobby.id) && Objects.equals(name, lobby.name) && Objects.equals(number, lobby.number) && Objects.equals(gameStatus, lobby.gameStatus) && Objects.equals(players, lobby.players);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, number, gameStatus);
+        return Objects.hash(id, name, number, gameStatus, players);
     }
 }

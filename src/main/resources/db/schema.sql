@@ -3,12 +3,14 @@ CREATE DATABASE mafia_db;
 DROP DATABASE mafia_db;
 DROP TABLE player CASCADE;
 DROP TABLE server_statistics;
+DROP TABLE lobby CASCADE;
 TRUNCATE TABLE player RESTART IDENTITY;
 TRUNCATE TABLE lobby RESTART IDENTITY CASCADE;
 
 CREATE TABLE lobby
 (
     id          BIGSERIAL NOT NULL PRIMARY KEY,
+    name        VARCHAR(50),
     number      INTEGER   NOT NULL,
     game_status BOOLEAN   NOT NULL
 );
@@ -40,4 +42,6 @@ CREATE TABLE server_statistics
     total_game_count INTEGER NOT NULL
 );
 
-SELECT lb.* FROM lobby lb WHERE lb.number = 523141;
+SELECT lb.*
+FROM lobby lb
+WHERE lb.number = 523141;

@@ -20,8 +20,8 @@ public class LobbyRepository {
     }
 
     public void add(Lobby lobby) {
-        jdbcTemplate.update("insert into lobby (number, game_status) values (?, ?)",
-                lobby.getNumber(), lobby.getGameStatus());
+        jdbcTemplate.update("insert into lobby (name, number, game_status) values (?, ?, ?)",
+                lobby.getName(), lobby.getNumber(), lobby.getGameStatus());
     }
 
     public List<Lobby> lobbies() {

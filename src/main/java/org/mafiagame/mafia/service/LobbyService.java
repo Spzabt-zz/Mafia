@@ -1,5 +1,6 @@
 package org.mafiagame.mafia.service;
 
+import org.mafiagame.mafia.controller.dto.CreateLobbyRequest;
 import org.mafiagame.mafia.exception.InvalidLobbyException;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
@@ -19,8 +20,6 @@ import java.util.Random;
 public class LobbyService {
     private final LobbyRepository lobbyRepository;
     private final PlayerRepository playerRepository;
-    //private Lobby lobby;
-    //private List<Player> players;
 
     @Autowired
     public LobbyService(LobbyRepository lobbyRepository, PlayerRepository playerRepository) {
@@ -28,20 +27,23 @@ public class LobbyService {
         this.playerRepository = playerRepository;
     }
 
-    public Lobby createGameLobby(/*List<Player> players,*/ Player admin) {
+    public Lobby createGameLobby(CreateLobbyRequest lobbyRequest) {
         Lobby lobby = new Lobby();
+        lobby.setName(lobbyRequest.getLobbyName());
         lobby.setNumber(getRandomNumberUsingNextInt(100000, 999999));
         lobby.setGameStatus(true);
         addLobby(lobby);
 
         lobby = lobbyRepository.selectCurrentLobbyByNumber(lobby.getNumber());
 
-        admin.setName("admin");
-        admin.setRole("mafia");
+        Player admin = new Player();
+
+        admin.setName(lobbyRequest.getAdminName());
+        /*admin.setRole("mafia");
         admin.setAlive(true);
         admin.setPosition(1);
         admin.setCandidate(false);
-        admin.setVote(0);
+        admin.setVote(0);*/
         admin.setAdmin(true);
         admin.setLobbyId(lobby.getId());
 
@@ -53,7 +55,27 @@ public class LobbyService {
         return lobby;
     }
 
-    public Lobby connectUserToLobby(String playerName, Integer number) throws InvalidLobbyException {
+    public Lobby getLobbyByNumber(Integer number) {
+        return lobbyRepository.selectCurrentLobbyByNumber(number);
+    }
+
+    public Player connectUserToLobby(String playerName, Integer number) throws InvalidLobbyException {
+        if (!LobbyStorage.getInstance().getLobby().containsKey(number)) {
+            throw new InvalidLobbyException("Game by number: " + number + " doesn't exist");
+        }
+        Lobby lobby = LobbyStorage.getInstance().getLobby().get(number);
+
+        Player player = new Player();
+        player.setName(playerName);
+        player.setLobbyId(lobby.getId());
+        lobby.setPlayers(player);
+        LobbyStorage.getInstance().setPlayers(lobby.getNumber(), lobby);
+        LobbyStorage.getInstance().setLobby(lobby);
+        playerRepository.add(player);
+
+        return player;
+    }
+    /*public Lobby connectUserToLobby(String playerName, Integer number) throws InvalidLobbyException {
         if (!LobbyStorage.getInstance().getLobby().containsKey(number)) {
             throw new InvalidLobbyException("Game by number: " + number + " doesn't exist");
         }
@@ -68,7 +90,7 @@ public class LobbyService {
         playerRepository.add(player);
 
         return lobby;
-    }
+    }*/
 
     public int getRandomNumberUsingNextInt(int min, int max) {
         Random random = new Random();

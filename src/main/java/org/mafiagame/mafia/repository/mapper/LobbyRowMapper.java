@@ -11,6 +11,7 @@ public class LobbyRowMapper implements RowMapper<Lobby> {
     public Lobby mapRow(ResultSet rs, int rowNum) throws SQLException {
         Lobby lobby = new Lobby();
         lobby.setId(rs.getInt("id"));
+        lobby.setName(rs.getString("name"));
         lobby.setNumber(rs.getInt("number"));
         lobby.setGameStatus(rs.getBoolean("game_status"));
 
