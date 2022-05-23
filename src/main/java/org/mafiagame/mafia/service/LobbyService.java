@@ -47,35 +47,25 @@ public class LobbyService {
 
         playerRepository.add(admin);
 
-        //List<Player> players = new ArrayList<>();
-        //players.add(admin);
-
-        //lobby.setPlayers(players);
         lobby.setPlayers(admin);
         LobbyStorage.getInstance().setPlayers(lobby.getNumber(), lobby);
-        //lobby.setPlayers(LobbyStorage.getInstance().getPlayers());
         LobbyStorage.getInstance().setLobby(lobby);
         return lobby;
     }
 
-    public Lobby connectUserToLobby(Player player, Integer number) throws InvalidLobbyException {
+    public Lobby connectUserToLobby(String playerName, Integer number) throws InvalidLobbyException {
         if (!LobbyStorage.getInstance().getLobby().containsKey(number)) {
             throw new InvalidLobbyException("Game by number: " + number + " doesn't exist");
         }
         Lobby lobby = LobbyStorage.getInstance().getLobby().get(number);
 
+        Player player = new Player();
+        player.setName(playerName);
         player.setLobbyId(lobby.getId());
         lobby.setPlayers(player);
         LobbyStorage.getInstance().setPlayers(lobby.getNumber(), lobby);
-        //lobby.setPlayers(LobbyStorage.getInstance().getPlayers());
         LobbyStorage.getInstance().setLobby(lobby);
         playerRepository.add(player);
-
-        /*Lobby lobby = lobbyRepository.selectCurrentLobbyByNumber(number);
-        player.setLobbyId(lobby.getId());
-        List<Player> players = new ArrayList<>();
-        players.add(player);
-        lobby.setPlayers(players);*/
 
         return lobby;
     }

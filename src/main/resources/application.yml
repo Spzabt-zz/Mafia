@@ -2,5 +2,5 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/mafia_db
     username: postgres
-    password: PASSWORD
+    password: spzabt_zz380
     driver-class-name: org.postgresql.Driver
