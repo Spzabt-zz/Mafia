@@ -9,7 +9,7 @@ public class Lobby {
     private String name;
     private Integer number;
     private Boolean gameStatus;
-    private final List<Player> players;
+    private List<Player> players;
 
     public Lobby() {
         players = new ArrayList<>();
@@ -61,6 +61,10 @@ public class Lobby {
 
     public void setPlayers(Player player) {
         players.add(player);
+    }
+
+    public void setPlayersList(List<Player> players) {
+        this.players = players;
     }
 
     @Override

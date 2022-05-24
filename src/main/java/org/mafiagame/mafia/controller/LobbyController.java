@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.mafiagame.mafia.controller.dto.ConnectRequest;
 import org.mafiagame.mafia.controller.dto.CreateLobbyRequest;
 import org.mafiagame.mafia.exception.InvalidLobbyException;
+import org.mafiagame.mafia.exception.InvalidLobbySizeException;
+import org.mafiagame.mafia.exception.InvalidPlayerNameException;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.service.LobbyService;
@@ -38,25 +40,16 @@ public class LobbyController {
     }
 
     @GetMapping("/lobby")
-    public ResponseEntity<Lobby> getLobbyByNumber(@RequestParam("number") Integer number) {
+    public ResponseEntity<Lobby> getLobbyByNumber(@RequestParam("number") Integer number) throws InvalidLobbyException {
         log.info("Get lobby by number: {}", number);
         return ResponseEntity.ok(lobbyService.getLobbyByNumber(number));
     }
 
     @PostMapping("/lobby/{number}/players")
-    public ResponseEntity<Player> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException {
+    public ResponseEntity<Player> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException, InvalidPlayerNameException, InvalidLobbySizeException {
         log.info("Connect player to lobby: connect req {}, number {}", connectRequest, number);
         return ResponseEntity.ok(lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number));
     }
-    /*@PostMapping("/lobby/{number}/players")
-    public ResponseEntity<Lobby> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException {
-        try {
-            return ResponseEntity.ok(lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number));
-        }
-    }*/
 
     @GetMapping("/lobby/{number}/players")
     public ResponseEntity<List<Player>> getPlayersInLobby(@PathVariable Integer number) {

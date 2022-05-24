@@ -1,12 +1,16 @@
 package org.mafiagame.mafia.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mafiagame.mafia.model.ServerStatistics;
 import org.mafiagame.mafia.service.ServerStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@Slf4j
 @RequestMapping("/v1")
 public class ServerStatisticsController {
     private final ServerStatisticsService serverStatisticsService;
@@ -17,22 +21,15 @@ public class ServerStatisticsController {
     }
 
     @PostMapping("/serverStatistics/add")
-    public ResponseEntity addServerStatistics(@RequestBody ServerStatistics serverStatistics) {
-        try {
-            serverStatisticsService.addServerStatistics(serverStatistics);
-            return ResponseEntity.ok("Server stats added");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Some error - " + e.getMessage());
-        }
+    public ResponseEntity<String> addServerStatistics(@RequestBody ServerStatistics serverStatistics) {
+        log.info("Add server stats: {}", serverStatistics);
+        serverStatisticsService.addServerStatistics(serverStatistics);
+        return ResponseEntity.ok("Server stats added");
     }
 
     @GetMapping("/serverStatistics/get")
-    public ResponseEntity getVotes() {
-        try {
-            return ResponseEntity.ok("Everything is working! " + serverStatisticsService.getServerStatistics());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Some error! " + e.getMessage());
-        }
+    public ResponseEntity<List<ServerStatistics>> getServerStatistics() {
+        log.info("Get server stats");
+        return ResponseEntity.ok(serverStatisticsService.getServerStatistics());
     }
 }
