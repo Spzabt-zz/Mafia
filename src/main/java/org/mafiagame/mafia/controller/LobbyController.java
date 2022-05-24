@@ -14,8 +14,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -33,37 +31,22 @@ public class LobbyController {
         this.playerService = playerService;
     }
 
-    //todo: request lobby name - OK
     @PostMapping("/lobby")
     public ResponseEntity<Lobby> addLobby(@RequestBody CreateLobbyRequest createLobbyRequest) {
-        try {
-            return ResponseEntity.ok(lobbyService.createGameLobby(createLobbyRequest));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(lobbyService.createGameLobby(createLobbyRequest));
-        }
+        log.info("Lobby request: {}", createLobbyRequest);
+        return ResponseEntity.ok(lobbyService.createGameLobby(createLobbyRequest));
     }
 
-    //todo: Пошук ігрового лоббі - DONE
     @GetMapping("/lobby")
-    public ResponseEntity<Lobby> getLobbyByNumber(@RequestParam("number") @PathVariable Integer number) {
-        try {
-            return ResponseEntity.ok(lobbyService.getLobbyByNumber(number));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(lobbyService.getLobbyByNumber(number));
-        }
+    public ResponseEntity<Lobby> getLobbyByNumber(@RequestParam("number") Integer number) {
+        log.info("Get lobby by number: {}", number);
+        return ResponseEntity.ok(lobbyService.getLobbyByNumber(number));
     }
 
-    //todo: Повернути 1 player'а - DONE
     @PostMapping("/lobby/{number}/players")
     public ResponseEntity<Player> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException {
-        try {
-            return ResponseEntity.ok(lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number));
-        }
+        log.info("Connect player to lobby: connect req {}, number {}", connectRequest, number);
+        return ResponseEntity.ok(lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number));
     }
     /*@PostMapping("/lobby/{number}/players")
     public ResponseEntity<Lobby> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException {
@@ -75,42 +58,23 @@ public class LobbyController {
         }
     }*/
 
-    //todo: Гравці в лоббі - DONE
     @GetMapping("/lobby/{number}/players")
-    public ResponseEntity<List<Player>> getPlayersByLobby(@PathVariable Integer number) {
-        try {
-            List<Player> playersByLobby = playerService.getPlayers()
-                    .stream()
-                    .filter(player -> Objects.equals(player.getLobbyId(), lobbyService.getLobbyByNumber(number).getId()))
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(playersByLobby);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(playerService.getPlayers());
-        }
+    public ResponseEntity<List<Player>> getPlayersInLobby(@PathVariable Integer number) {
+        log.info("Get players in lobby: {}", number);
+        return ResponseEntity.ok(lobbyService.getPlayersInLobby(number));
     }
 
-    //todo: Адмін може видалити гравця з лоббі
     @DeleteMapping("/lobby/{player_id}")
     public ResponseEntity<String> removePlayerByAdmin(@PathVariable Integer player_id) {
-        try {
-            playerService.deletePlayer(player_id);
-            return ok("Player deleted!");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body("Some error! " + e.getMessage());
-        }
+        playerService.deletePlayer(player_id);
+        log.info("Delete players in lobby: {}", player_id);
+        return ok("Player deleted!");
     }
 
     @GetMapping("/lobbies")
     public ResponseEntity<List<Lobby>> getLobbies() {
-        try {
-            log.info("Lobbies: {}", lobbyService.getLobbies());
-            return ResponseEntity.ok(lobbyService.getLobbies());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body(lobbyService.getLobbies());
-        }
+        log.info("Lobbies: {}", lobbyService.getLobbies());
+        return ResponseEntity.ok(lobbyService.getLobbies());
     }
 
     /*@DeleteMapping("/lobby/{id}")

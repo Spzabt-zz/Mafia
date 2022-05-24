@@ -6,15 +6,14 @@ import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.repository.LobbyRepository;
 import org.mafiagame.mafia.repository.PlayerRepository;
-import org.mafiagame.mafia.storage.GameStorage;
 import org.mafiagame.mafia.storage.LobbyStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class LobbyService {
@@ -51,13 +50,14 @@ public class LobbyService {
         playerRepository.add(admin);
 
         lobby.setPlayers(admin);
-        LobbyStorage.getInstance().setPlayers(lobby.getNumber(), lobby);
-        LobbyStorage.getInstance().setLobby(lobby);
+        LobbyStorage.getInstance().setPlayersAndLobby(lobby.getNumber(), lobby);
+        //LobbyStorage.getInstance().setLobby(lobby);
         return lobby;
     }
 
     public Lobby getLobbyByNumber(Integer number) {
-        return lobbyRepository.selectCurrentLobbyByNumber(number);
+        return LobbyStorage.getInstance().getLobby().get(number);
+        //return lobbyRepository.selectCurrentLobbyByNumber(number);
     }
 
     public Player connectUserToLobby(String playerName, Integer number) throws InvalidLobbyException {
@@ -74,8 +74,8 @@ public class LobbyService {
         player.setName(playerName);
         player.setLobbyId(lobby.getId());
         lobby.setPlayers(player);
-        LobbyStorage.getInstance().setPlayers(lobby.getNumber(), lobby);
-        LobbyStorage.getInstance().setLobby(lobby);
+        LobbyStorage.getInstance().setPlayersAndLobby(lobby.getNumber(), lobby);
+        //LobbyStorage.getInstance().setLobby(lobby);
         playerRepository.add(player);
 
         return player;
@@ -96,6 +96,13 @@ public class LobbyService {
 
         return lobby;
     }*/
+
+    public List<Player> getPlayersInLobby(Integer number) {
+        return playerRepository.players()
+                .stream()
+                .filter(player -> Objects.equals(player.getLobbyId(), getLobbyByNumber(number).getId()))
+                .collect(Collectors.toList());
+    }
 
     public int getRandomNumberUsingNextInt(int min, int max) {
         Random random = new Random();

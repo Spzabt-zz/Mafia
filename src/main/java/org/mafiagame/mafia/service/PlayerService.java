@@ -15,20 +15,6 @@ public class PlayerService {
     public PlayerService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
-    //private final PlayerRepo playerRepository;
-
-//    @Autowired
-//    public PlayerService(PlayerRepo playerRepository) {
-//        this.playerRepository = playerRepository;
-//    }
-
-//    public PlayerEntity addPlayer(PlayerEntity player) {
-//        return playerRepository.save(player);
-//    }
-//
-//    public List<PlayerEntity> getPlayers() {
-//        return playerRepository.findAll();
-//    }
 
     public void addPlayer(Player player) {
          playerRepository.add(player);
