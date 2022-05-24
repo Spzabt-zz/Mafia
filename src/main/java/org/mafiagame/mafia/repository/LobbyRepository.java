@@ -31,6 +31,11 @@ public class LobbyRepository {
                 new LobbyRowMapper(), number);
     }
 
+    public Lobby selectCurrentLobbyByPlayerLobbyId(int lobbyId) {
+        return jdbcTemplate.queryForObject("SELECT lb.* FROM lobby lb INNER JOIN player p on lb.id = ? LIMIT 1",
+                new LobbyRowMapper(), lobbyId);
+    }
+
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM lobby WHERE id=?", id);
     }

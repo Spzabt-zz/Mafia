@@ -26,6 +26,16 @@ public class PlayerRepository {
         return jdbcTemplate.query("SELECT * FROM player", new PlayerRowMapper());
     }
 
+    public Player selectCurrentPlayerById(int id) {
+        return jdbcTemplate.queryForObject("SELECT pl.* FROM player pl WHERE pl.id = ?",
+                new PlayerRowMapper(), id);
+    }
+
+    public Player selectCurrentPlayerByLobbyId(int lobbyId, String playerName) {
+        return jdbcTemplate.queryForObject("SELECT pl.* FROM player pl WHERE pl.lobby_id = ? AND pl.name = ?",
+                new PlayerRowMapper(), lobbyId, playerName);
+    }
+
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM player WHERE id=?", id);
     }

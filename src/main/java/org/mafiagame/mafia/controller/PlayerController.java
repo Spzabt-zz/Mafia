@@ -1,12 +1,16 @@
 package org.mafiagame.mafia.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@Slf4j
 @RequestMapping("/v1")
 public class PlayerController {
     private final PlayerService playerService;
@@ -17,32 +21,15 @@ public class PlayerController {
     }
 
     @PostMapping("/player")
-    public ResponseEntity addPlayer(@RequestBody Player player) {
-        try {
-            playerService.addPlayer(player);
-            return ResponseEntity.ok("Player added");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Some error - " + e.getMessage());
-        }
+    public ResponseEntity<String> addPlayer(@RequestBody Player player) {
+        log.info("Add player: {}", player);
+        playerService.addPlayer(player);
+        return ResponseEntity.ok("Player added");
     }
 
     @GetMapping("/players")
-    public ResponseEntity getPlayers() {
-        try {
-            return ResponseEntity.ok("Everything is working! " + playerService.getPlayers());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Some error! " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/players/{id}")
-    public ResponseEntity deletePlayer(@PathVariable Integer id) {
-        try {
-            playerService.deletePlayer(id);
-            return ResponseEntity.ok("Player deleted!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Some error! " + e.getMessage());
-        }
+    public ResponseEntity<List<Player>> getPlayers() {
+        log.info("Get players");
+        return ResponseEntity.ok(playerService.getPlayers());
     }
 }
