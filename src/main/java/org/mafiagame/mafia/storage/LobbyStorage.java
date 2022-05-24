@@ -3,7 +3,6 @@ package org.mafiagame.mafia.storage;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +34,7 @@ public class LobbyStorage {
         return lobbies.get(number).getPlayers();
     }
 
-    public void setPlayers(/*Player player, */Integer number, Lobby lobby) {
-        //lobbies.put(number).setPlayers(player);
+    public void setPlayersAndLobby(Integer number, Lobby lobby) {
         lobbies.put(number, lobby);
     }
 }

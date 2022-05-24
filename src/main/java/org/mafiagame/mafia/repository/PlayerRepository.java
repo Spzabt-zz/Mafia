@@ -23,7 +23,7 @@ public class PlayerRepository {
     }
 
     public List<Player> players() {
-        return jdbcTemplate.query("SELECT * FROM player", new PlayerRowMapper()/*new BeanPropertyRowMapper<>(Player.class)*/);
+        return jdbcTemplate.query("SELECT * FROM player", new PlayerRowMapper());
     }
 
     public void delete(int id) {

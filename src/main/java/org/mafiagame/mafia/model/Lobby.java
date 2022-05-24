@@ -10,8 +10,17 @@ public class Lobby {
     private Integer number;
     private Boolean gameStatus;
     private final List<Player> players;
+
     public Lobby() {
         players = new ArrayList<>();
+    }
+
+    public static Lobby toModelWithoutListOfPlayers(Lobby lobby) {
+        Lobby lobbyModel = new Lobby();
+        lobby.setName(lobby.getName());
+        lobby.setNumber(lobby.getNumber());
+        lobby.setGameStatus(lobby.getGameStatus());
+        return lobby;
     }
 
     public Integer getId() {
