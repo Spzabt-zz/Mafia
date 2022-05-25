@@ -25,7 +25,6 @@ import static org.springframework.http.ResponseEntity.ok;
 public class LobbyController {
     private final LobbyService lobbyService;
     private final PlayerService playerService;
-    private SimpMessagingTemplate simpleMessageTemplate;
 
     @Autowired
     public LobbyController(LobbyService lobbyService, PlayerService playerService) {

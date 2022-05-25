@@ -1,6 +1,6 @@
 package org.mafiagame.mafia.storage;
 
-import org.mafiagame.mafia.model.MafiaGame;
+import org.mafiagame.mafia.model.game.MafiaGame;
 
 import java.util.HashMap;
 import java.util.Map;

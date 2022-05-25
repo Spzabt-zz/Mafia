@@ -11,10 +11,10 @@ TRUNCATE TABLE lobby RESTART IDENTITY CASCADE;
 
 CREATE TABLE lobby
 (
-    id          BIGSERIAL NOT NULL PRIMARY KEY,
+    id          BIGSERIAL   NOT NULL PRIMARY KEY,
     name        VARCHAR(50),
-    number      INTEGER   NOT NULL,
-    game_status BOOLEAN   NOT NULL
+    number      INTEGER     NOT NULL,
+    game_status VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE player

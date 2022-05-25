@@ -1,10 +1,16 @@
 package org.mafiagame.mafia.service;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class MafiaGameService {
     private LobbyService lobbyService;
+
+    @Autowired
+    public MafiaGameService(LobbyService lobbyService) {
+        this.lobbyService = lobbyService;
+    }
+
+
 }

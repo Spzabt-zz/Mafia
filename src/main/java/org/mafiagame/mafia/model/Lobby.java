@@ -8,7 +8,8 @@ public class Lobby {
     private Integer id;
     private String name;
     private Integer number;
-    private Boolean gameStatus;
+    private String gameStatus;
+
     private List<Player> players;
 
     public Lobby() {
@@ -47,11 +48,11 @@ public class Lobby {
         this.number = number;
     }
 
-    public Boolean getGameStatus() {
+    public String getGameStatus() {
         return gameStatus;
     }
 
-    public void setGameStatus(Boolean gameStatus) {
+    public void setGameStatus(String gameStatus) {
         this.gameStatus = gameStatus;
     }
 
