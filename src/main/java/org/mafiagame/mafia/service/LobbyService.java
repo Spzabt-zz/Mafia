@@ -4,6 +4,7 @@ import org.mafiagame.mafia.controller.dto.CreateLobbyRequest;
 import org.mafiagame.mafia.exception.InvalidLobbyException;
 import org.mafiagame.mafia.exception.InvalidLobbySizeException;
 import org.mafiagame.mafia.exception.InvalidPlayerNameException;
+import org.mafiagame.mafia.model.GameStatus;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.model.PlayerRole;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class LobbyService {
+    private static final int MIN_COUNT_PLAYERS_IN_LOBBY = 4;
     private static final int MAX_COUNT_PLAYERS_IN_LOBBY = 12;
     private final LobbyRepository lobbyRepository;
     private final PlayerRepository playerRepository;
@@ -34,7 +36,7 @@ public class LobbyService {
         Lobby lobby = new Lobby();
         lobby.setName(lobbyRequest.getLobbyName());
         lobby.setNumber(getRandomNumberUsingNextInt(100000, 999999));
-        lobby.setGameStatus(true);
+        lobby.setGameStatus(GameStatus.NEW.toString());
         addLobby(lobby);
 
         lobby = lobbyRepository.selectCurrentLobbyByNumber(lobby.getNumber());
@@ -132,5 +134,13 @@ public class LobbyService {
 
     public void deleteLobby(Integer id) {
         lobbyRepository.delete(id);
+    }
+
+    public Lobby startGame(Integer number) throws InvalidLobbySizeException {
+        if (LobbyStorage.getInstance().getLobby().get(number).getPlayers().size() < MIN_COUNT_PLAYERS_IN_LOBBY) {
+            throw new InvalidLobbySizeException("In lobby players");
+        }
+        LobbyStorage.getInstance().getLobby().get(number).setGameStatus(GameStatus.IN_PROGRESS.toString());
+        return lobbyRepository.startGame(number);
     }
 }
