@@ -9,7 +9,6 @@ public class Lobby {
     private String name;
     private Integer number;
     private String gameStatus;
-
     private List<Player> players;
 
     public Lobby() {

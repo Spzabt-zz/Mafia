@@ -14,9 +14,7 @@ import org.mafiagame.mafia.storage.LobbyStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,9 +123,77 @@ public class LobbyService {
         }
         Lobby currLobby = LobbyStorage.getInstance().getLobby().get(number);
         currLobby.setGameStatus(GameStatus.IN_PROGRESS.toString());
-        LobbyStorage.getInstance().setLobby(currLobby);
+        Lobby modifiedLobby = setPlayerStats(currLobby);
+        LobbyStorage.getInstance().setLobby(modifiedLobby);
         lobbyRepository.startGame(number);
         return currLobby;
+    }
+
+    private Lobby setPlayerStats(Lobby lobby) {
+        int count = 0;
+        int playerCount = lobby.getPlayers().size();
+        List<String> listOfPlayerRoles = null;
+
+        /*int s = 1;
+        int x = (playerCount * 2 - 3) / 3;*/
+
+        int sheriffCount = 1;
+        switch (playerCount) {
+            case 4:
+            case 5:
+                listOfPlayerRoles = new ArrayList<>(List.of(PlayerRole.MAFIA.toString(), PlayerRole.SHERIFF.toString()));
+                int mafiaCount = 1;
+                int civilianCount = playerCount - sheriffCount - mafiaCount;
+                for (int i = 0; i < civilianCount; i++) {
+                    listOfPlayerRoles.add(PlayerRole.CIVILIAN.toString());
+                }
+                break;
+            case 6:
+            case 7:
+            case 8:
+                listOfPlayerRoles = new ArrayList<>(List.of(PlayerRole.MAFIA.toString(), PlayerRole.MAFIA.toString(), PlayerRole.SHERIFF.toString()));
+                mafiaCount = 2;
+                civilianCount = playerCount - sheriffCount - mafiaCount;
+                for (int i = 0; i < civilianCount; i++) {
+                    listOfPlayerRoles.add(PlayerRole.CIVILIAN.toString());
+                }
+                break;
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+                listOfPlayerRoles = new ArrayList<>(List.of(PlayerRole.MAFIA.toString(), PlayerRole.MAFIA.toString(), PlayerRole.MAFIA.toString(), PlayerRole.SHERIFF.toString()));
+                mafiaCount = 3;
+                civilianCount = playerCount - sheriffCount - mafiaCount;
+                for (int i = 0; i < civilianCount; i++) {
+                    listOfPlayerRoles.add(PlayerRole.CIVILIAN.toString());
+                }
+                break;
+            default:
+                break;
+        }
+
+        for (Player player : lobby.getPlayers()) {
+            count++;
+            assert listOfPlayerRoles != null;
+            player.setRole(getRandomRole(listOfPlayerRoles));
+            player.setAlive(true);
+            player.setPosition(count);
+            playerRepository.updatePlayer(player.getPosition(), player.getAlive(), player.getRole(), player.getId());
+        }
+
+        return lobby;
+    }
+
+    private String getRandomRole(List<String> playerRoles) {
+        int randomIndex = 0;
+        if (playerRoles.size() != 1) {
+            randomIndex = getRandomNumberUsingNextInt(0, playerRoles.size());
+        }
+        String randomElement = playerRoles.get(randomIndex);
+        playerRoles.remove(randomIndex);
+
+        return randomElement;
     }
 
     public int getRandomNumberUsingNextInt(int min, int max) {

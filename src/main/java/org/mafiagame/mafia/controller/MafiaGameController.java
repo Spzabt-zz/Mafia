@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/v1")
 public class MafiaGameController {
-    private LobbyService lobbyService;
+    private final LobbyService lobbyService;
     private SimpMessagingTemplate simpleMessageTemplate;
 
     @Autowired
@@ -29,6 +29,7 @@ public class MafiaGameController {
 
     @GetMapping("/lobby/{number}/mafia_game")
     public ResponseEntity gameStatus(@PathVariable Integer number, @RequestBody MafiaGamePlay request) {
+        //simpleMessageTemplate.convertAndSend("/", request);
         return ResponseEntity.ok("Game status");
     }
 }
