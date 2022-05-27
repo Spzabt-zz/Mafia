@@ -13,6 +13,9 @@ repositories {
 /*node {
     download = true
 }*/
+compileJava {
+    options.release = 11
+}
 
 dependencies {
     // https://mvnrepository.com/artifact/org.webjars/webjars-locator
