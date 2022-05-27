@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp target/classes:target/dependency/ org.mafiagame.mafia.MafiaApplication
+web: java $JAVA_OPTS -cp target/production/classes org.mafiagame.mafia.MafiaApplication
