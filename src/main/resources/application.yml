@@ -4,5 +4,6 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:spzabt_zz380}
     driver-class-name: org.postgresql.Driver
+  flyway:
 server:
   port: ${PORT:8080}
