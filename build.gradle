@@ -17,6 +17,14 @@ compileJava {
     options.release = 11
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.mafiagame.mafia.MafiaApplication'
+        )
+    }
+}
+
 dependencies {
     // https://mvnrepository.com/artifact/org.webjars/webjars-locator
     implementation group: 'org.webjars', name: 'webjars-locator', version: '0.45'
