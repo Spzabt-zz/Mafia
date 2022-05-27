@@ -20,6 +20,10 @@ public class GameStorage {
         return instance;
     }
 
+    public MafiaGame getMafiaGame(Integer number) {
+        return gameSessions.get(number);
+    }
+
     public Map<Integer, MafiaGame> getGames() {
         return gameSessions;
     }

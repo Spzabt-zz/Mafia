@@ -4,12 +4,17 @@ import org.mafiagame.mafia.controller.dto.CreateLobbyRequest;
 import org.mafiagame.mafia.exception.InvalidLobbyException;
 import org.mafiagame.mafia.exception.InvalidLobbySizeException;
 import org.mafiagame.mafia.exception.InvalidPlayerNameException;
+import org.mafiagame.mafia.model.Votes;
 import org.mafiagame.mafia.model.enam.GameStatus;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
+import org.mafiagame.mafia.model.enam.Phase;
 import org.mafiagame.mafia.model.enam.PlayerRole;
+import org.mafiagame.mafia.model.game.MafiaGame;
 import org.mafiagame.mafia.repository.LobbyRepository;
 import org.mafiagame.mafia.repository.PlayerRepository;
+import org.mafiagame.mafia.repository.VotesRepository;
+import org.mafiagame.mafia.storage.GameStorage;
 import org.mafiagame.mafia.storage.LobbyStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +28,13 @@ public class LobbyService {
     private static final int MAX_COUNT_PLAYERS_IN_LOBBY = 12;
     private final LobbyRepository lobbyRepository;
     private final PlayerRepository playerRepository;
+    private final VotesRepository votesRepository;
 
     @Autowired
-    public LobbyService(LobbyRepository lobbyRepository, PlayerRepository playerRepository) {
+    public LobbyService(LobbyRepository lobbyRepository, PlayerRepository playerRepository, VotesRepository votesRepository) {
         this.lobbyRepository = lobbyRepository;
         this.playerRepository = playerRepository;
+        this.votesRepository = votesRepository;
     }
 
     public Lobby createGameLobby(CreateLobbyRequest lobbyRequest) {
@@ -125,7 +132,14 @@ public class LobbyService {
         currLobby.setGameStatus(GameStatus.IN_PROGRESS.toString());
         Lobby modifiedLobby = setPlayerStats(currLobby);
         LobbyStorage.getInstance().setLobby(modifiedLobby);
-        lobbyRepository.startGame(number);
+        lobbyRepository.updateLobbyStatus(number);
+
+        MafiaGame mafiaGame = new MafiaGame();
+        mafiaGame.setDay(1);
+        mafiaGame.setPhase(Phase.SPEECH);
+        mafiaGame.setLobby(currLobby);
+        GameStorage.getInstance().setGame(mafiaGame);
+
         return currLobby;
     }
 
@@ -179,7 +193,10 @@ public class LobbyService {
             player.setRole(getRandomRole(listOfPlayerRoles));
             player.setAlive(true);
             player.setPosition(count);
+            Votes currVote = new Votes(player.getId(), 0, 1);
+            player.setVotes(currVote);
             playerRepository.updatePlayer(player.getPosition(), player.getAlive(), player.getRole(), player.getId());
+            votesRepository.add(currVote);
         }
 
         return lobby;
@@ -194,6 +211,10 @@ public class LobbyService {
         playerRoles.remove(randomIndex);
 
         return randomElement;
+    }
+
+    public MafiaGame getGameStatus(Integer number) {
+        return GameStorage.getInstance().getMafiaGame(number);
     }
 
     public int getRandomNumberUsingNextInt(int min, int max) {

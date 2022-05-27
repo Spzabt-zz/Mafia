@@ -1,8 +1,10 @@
 package org.mafiagame.mafia.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.mafiagame.mafia.controller.dto.CandidateRequest;
 import org.mafiagame.mafia.exception.InvalidLobbySizeException;
 import org.mafiagame.mafia.model.Lobby;
+import org.mafiagame.mafia.model.game.MafiaGame;
 import org.mafiagame.mafia.model.game.MafiaGamePlay;
 import org.mafiagame.mafia.service.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,18 @@ public class MafiaGameController {
 
     @PutMapping("/lobby/{number}/mafia_game")
     public ResponseEntity<Lobby> startGame(@PathVariable Integer number) throws InvalidLobbySizeException {
+        log.info("Game started at lobby number: {}", number);
         return ResponseEntity.ok(lobbyService.startGame(number));
     }
 
     @GetMapping("/lobby/{number}/mafia_game")
-    public ResponseEntity gameStatus(@PathVariable Integer number, @RequestBody MafiaGamePlay request) {
-        //simpleMessageTemplate.convertAndSend("/", request);
-        return ResponseEntity.ok("Game status");
+    public ResponseEntity<MafiaGame> gameStatus(@PathVariable Integer number) {
+        log.info("Game status at lobby number: {}", number);
+        return ResponseEntity.ok(lobbyService.getGameStatus(number));
+    }
+
+    @PostMapping("/lobby/{number}/candidates")
+    public ResponseEntity candidateNomination(@PathVariable Integer number, @RequestBody CandidateRequest request) {
+        return ResponseEntity.ok("OK");
     }
 }

@@ -12,6 +12,8 @@ public class Player {
     private Integer vote;
     private Boolean admin;
     private Integer lobbyId;
+    private Votes votes;
+
 
     public Player() {
 
@@ -89,6 +91,27 @@ public class Player {
         this.lobbyId = lobbyId;
     }
 
+    public Votes getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Votes votes) {
+        this.votes = votes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return Objects.equals(id, player.id) && Objects.equals(name, player.name) && Objects.equals(role, player.role) && Objects.equals(alive, player.alive) && Objects.equals(position, player.position) && Objects.equals(candidate, player.candidate) && Objects.equals(vote, player.vote) && Objects.equals(admin, player.admin) && Objects.equals(lobbyId, player.lobbyId) && Objects.equals(votes, player.votes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, role, alive, position, candidate, vote, admin, lobbyId, votes);
+    }
+
     @Override
     public String toString() {
         return "Player{" +
@@ -101,19 +124,7 @@ public class Player {
                 ", vote=" + vote +
                 ", admin=" + admin +
                 ", lobbyId=" + lobbyId +
+                ", votes=" + votes +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Player player = (Player) o;
-        return Objects.equals(id, player.id) && Objects.equals(name, player.name) && Objects.equals(role, player.role) && Objects.equals(alive, player.alive) && Objects.equals(position, player.position) && Objects.equals(candidate, player.candidate) && Objects.equals(vote, player.vote) && Objects.equals(admin, player.admin) && Objects.equals(lobbyId, player.lobbyId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, role, alive, position, candidate, vote, admin, lobbyId);
     }
 }

@@ -11,6 +11,12 @@ public class Votes {
 
     }
 
+    public Votes(Integer playerId, Integer candidateId, Integer day) {
+        this.playerId = playerId;
+        this.candidateId = candidateId;
+        this.day = day;
+    }
+
     public Integer getPlayerId() {
         return playerId;
     }
