@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp target/production/classes org.mafiagame.mafia.MafiaApplication
+web: java -jar build/libs/Mafia-1.0-SNAPSHOT.jar
