@@ -61,7 +61,7 @@ public class LobbyController {
     public ResponseEntity<String> removePlayerByAdmin(@PathVariable Integer player_id) {
         playerService.deletePlayer(player_id);
         log.info("Delete players in lobby: {}", player_id);
-        return ResponseEntity.ok("Player deleted!");
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/lobbies")
