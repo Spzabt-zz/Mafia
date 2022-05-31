@@ -30,6 +30,10 @@ public class LobbyStorage {
         lobbies.put(lobby.getNumber(), lobby);
     }
 
+    public void setLobbies(Map<Integer, Lobby> lobbies) {
+        LobbyStorage.lobbies = lobbies;
+    }
+
     public List<Player> getPlayers(Integer number) {
         return lobbies.get(number).getPlayers();
     }

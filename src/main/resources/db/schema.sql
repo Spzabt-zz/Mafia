@@ -44,6 +44,17 @@ CREATE TABLE server_statistics
     total_game_count INTEGER NOT NULL
 );
 
+ALTER TABLE player
+    DROP CONSTRAINT player_lobby_id_fkey,
+    ADD CONSTRAINT player_lobby_id_fkey
+        FOREIGN KEY (lobby_id) REFERENCES lobby (id) ON DELETE CASCADE;
+DELETE
+FROM player
+WHERE lobby_id = 3;
+DELETE
+FROM lobby
+WHERE id = 3;
+
 
 SELECT lb.*
 FROM lobby lb

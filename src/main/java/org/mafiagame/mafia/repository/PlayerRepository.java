@@ -40,6 +40,10 @@ public class PlayerRepository {
         jdbcTemplate.update("DELETE FROM player WHERE id=?", id);
     }
 
+    public void deleteByLobbyId(int lobbyId) {
+        jdbcTemplate.update("DELETE FROM player WHERE lobby_id=?", lobbyId);
+    }
+
     public void updatePlayer(int position, boolean alive, String playerRole, int playerId) {
         jdbcTemplate.update("UPDATE player SET role = ?, alive = ?, position = ? WHERE id = ?", playerRole, alive, position, playerId);
     }

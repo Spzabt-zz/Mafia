@@ -21,10 +21,7 @@ import org.mafiagame.mafia.storage.LobbyStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -256,6 +253,11 @@ public class LobbyService {
     }
 
     public void deleteLobby(Integer id) {
+        Lobby currLobby = lobbyRepository.selectCurrentLobbyByPlayerLobbyId(id);
+        Map<Integer, Lobby> lobbyMap= LobbyStorage.getInstance().getLobby();
+        lobbyMap.remove(currLobby.getNumber());
+        LobbyStorage.getInstance().setLobbies(lobbyMap);
+        playerRepository.deleteByLobbyId(id);
         lobbyRepository.delete(id);
     }
 }
