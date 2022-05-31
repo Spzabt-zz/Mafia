@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @Slf4j
@@ -73,6 +74,6 @@ public class LobbyController {
     public ResponseEntity<String> deleteLobby(@RequestParam("id") Integer id) {
         log.info("Lobby deleted by id: {}", id);
         lobbyService.deleteLobby(id);
-        return ResponseEntity.ok("Lobby deleted!");
+        return ResponseEntity.noContent().build();
     }
 }
