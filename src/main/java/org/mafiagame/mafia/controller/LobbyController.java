@@ -60,7 +60,7 @@ public class LobbyController {
     public ResponseEntity<String> removePlayerByAdmin(@PathVariable Integer player_id) {
         playerService.deletePlayer(player_id);
         log.info("Delete players in lobby: {}", player_id);
-        return ok("Player deleted!");
+        return ResponseEntity.ok("Player deleted!");
     }
 
     @GetMapping("/lobbies")
@@ -73,6 +73,6 @@ public class LobbyController {
     public ResponseEntity<String> deleteLobby(@RequestParam("id") Integer id) {
         log.info("Lobby deleted by id: {}", id);
         lobbyService.deleteLobby(id);
-        return ok("Lobby deleted!");
+        return ResponseEntity.ok("Lobby deleted!");
     }
 }
