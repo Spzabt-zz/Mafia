@@ -2,12 +2,14 @@ package org.mafiagame.mafia.service;
 
 import org.mafiagame.mafia.controller.dto.CreateLobbyRequest;
 import org.mafiagame.mafia.exception.InvalidLobbyException;
+import org.mafiagame.mafia.exception.InvalidLobbyNumberException;
 import org.mafiagame.mafia.exception.InvalidLobbySizeException;
 import org.mafiagame.mafia.exception.InvalidPlayerNameException;
-import org.mafiagame.mafia.model.Votes;
-import org.mafiagame.mafia.model.enam.GameStatus;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.Player;
+import org.mafiagame.mafia.model.Votes;
+import org.mafiagame.mafia.model.enam.DayTime;
+import org.mafiagame.mafia.model.enam.GameStatus;
 import org.mafiagame.mafia.model.enam.Phase;
 import org.mafiagame.mafia.model.enam.PlayerRole;
 import org.mafiagame.mafia.model.game.MafiaGame;
@@ -19,7 +21,10 @@ import org.mafiagame.mafia.storage.LobbyStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +42,22 @@ public class LobbyService {
         this.votesRepository = votesRepository;
     }
 
-    public Lobby createGameLobby(CreateLobbyRequest lobbyRequest) {
+    public Lobby createGameLobby(CreateLobbyRequest lobbyRequest) throws InvalidLobbyNumberException, InvalidPlayerNameException {
+        if (lobbyRequest.getAdminName() == null) {
+            throw new InvalidPlayerNameException("Name can't be null");
+        }
+
         Lobby lobby = new Lobby();
         lobby.setName(lobbyRequest.getLobbyName());
-        lobby.setNumber(getRandomNumberUsingNextInt(100000, 999999));
+
+        int lbNumber = getRandomNumberUsingNextInt(100000, 999999);
+        for (Lobby lobbyNumber : lobbyRepository.lobbies()) {
+            if (lobbyNumber.getNumber() == lbNumber) {
+                throw new InvalidLobbyNumberException("Lobby with number: " + lbNumber + " already exists");
+            }
+        }
+
+        lobby.setNumber(lbNumber);
         lobby.setGameStatus(GameStatus.NEW.toString());
         addLobby(lobby);
 
@@ -68,6 +85,10 @@ public class LobbyService {
     }
 
     public Player connectUserToLobby(String playerName, Integer number) throws InvalidLobbyException, InvalidPlayerNameException, InvalidLobbySizeException {
+        if (playerName == null) {
+            throw  new InvalidPlayerNameException("Name can't be null");
+        }
+
         if (!LobbyStorage.getInstance().getLobby().containsKey(number)) {
             throw new InvalidLobbyException("Game by number: " + number + " doesn't exist");
         }
@@ -124,6 +145,7 @@ public class LobbyService {
                 .collect(Collectors.toList());
     }
 
+    //todo change method
     public Lobby startGame(Integer number) throws InvalidLobbySizeException {
         if (LobbyStorage.getInstance().getLobby().get(number).getPlayers().size() < MIN_COUNT_PLAYERS_IN_LOBBY) {
             throw new InvalidLobbySizeException("Min players in lobby " + MIN_COUNT_PLAYERS_IN_LOBBY + ". Invite more people");
@@ -136,6 +158,7 @@ public class LobbyService {
 
         MafiaGame mafiaGame = new MafiaGame();
         mafiaGame.setDay(1);
+        mafiaGame.setDayTime(DayTime.NIGHT);
         mafiaGame.setPhase(Phase.SPEECH);
         mafiaGame.setLobby(currLobby);
         GameStorage.getInstance().setGame(mafiaGame);
@@ -216,6 +239,8 @@ public class LobbyService {
     public MafiaGame getGameStatus(Integer number) {
         return GameStorage.getInstance().getMafiaGame(number);
     }
+
+    //public
 
     public int getRandomNumberUsingNextInt(int min, int max) {
         Random random = new Random();

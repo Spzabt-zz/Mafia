@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.mafiagame.mafia.controller.dto.ConnectRequest;
 import org.mafiagame.mafia.controller.dto.CreateLobbyRequest;
 import org.mafiagame.mafia.exception.InvalidLobbyException;
+import org.mafiagame.mafia.exception.InvalidLobbyNumberException;
 import org.mafiagame.mafia.exception.InvalidLobbySizeException;
 import org.mafiagame.mafia.exception.InvalidPlayerNameException;
 import org.mafiagame.mafia.model.Lobby;
@@ -32,8 +33,8 @@ public class LobbyController {
     }
 
     @PostMapping("/lobby")
-    public ResponseEntity<Lobby> addLobby(@RequestBody CreateLobbyRequest createLobbyRequest) {
-        log.info("Lobby request: {}", createLobbyRequest);
+    public ResponseEntity<Lobby> addLobby(@RequestBody CreateLobbyRequest createLobbyRequest) throws InvalidLobbyNumberException, InvalidPlayerNameException {
+        log.info("Lobby created: {}", createLobbyRequest);
         return ResponseEntity.ok(lobbyService.createGameLobby(createLobbyRequest));
     }
 
@@ -68,13 +69,10 @@ public class LobbyController {
         return ResponseEntity.ok(lobbyService.getLobbies());
     }
 
-    /*@DeleteMapping("/lobby/{id}")
-    public ResponseEntity deleteLobby(@PathVariable Integer id) {
-        try {
-            lobbyService.deleteLobby(id);
-            return ok("Lobby deleted!");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Some error! " + e.getMessage());
-        }
-    }*/
+    @DeleteMapping("/lobby")
+    public ResponseEntity<String> deleteLobby(@RequestParam("id") Integer id) {
+        log.info("Lobby deleted by id: {}", id);
+        lobbyService.deleteLobby(id);
+        return ok("Lobby deleted!");
+    }
 }

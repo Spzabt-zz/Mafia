@@ -29,7 +29,6 @@ public class MafiaGameController {
         log.info("Game started at lobby number: {}", number);
         return ResponseEntity.ok(lobbyService.startGame(number));
     }
-
     @GetMapping("/lobby/{number}/mafia_game")
     public ResponseEntity<MafiaGame> gameStatus(@PathVariable Integer number) {
         log.info("Game status at lobby number: {}", number);
@@ -38,6 +37,9 @@ public class MafiaGameController {
 
     @PostMapping("/lobby/{number}/candidates")
     public ResponseEntity candidateNomination(@PathVariable Integer number, @RequestBody CandidateRequest request) {
+
+        //simpleMessageTemplate.convertAndSend("/topic/game-progress/" + number, request);
+        log.info("Candidate nominated by number: {}", number);
         return ResponseEntity.ok("OK");
     }
 }
