@@ -1,5 +1,6 @@
 package org.mafiagame.mafia.service;
 
+import org.mafiagame.mafia.controller.dto.CandidateRequest;
 import org.mafiagame.mafia.controller.dto.CreateLobbyRequest;
 import org.mafiagame.mafia.exception.InvalidLobbyException;
 import org.mafiagame.mafia.exception.InvalidLobbyNumberException;
@@ -83,7 +84,7 @@ public class LobbyService {
 
     public Player connectUserToLobby(String playerName, Integer number) throws InvalidLobbyException, InvalidPlayerNameException, InvalidLobbySizeException {
         if (playerName == null) {
-            throw  new InvalidPlayerNameException("Name can't be null");
+            throw new InvalidPlayerNameException("Name can't be null");
         }
 
         if (!LobbyStorage.getInstance().getLobby().containsKey(number)) {
@@ -157,8 +158,11 @@ public class LobbyService {
         mafiaGame.setDay(1);
         mafiaGame.setDayTime(DayTime.NIGHT);
         mafiaGame.setPhase(Phase.SPEECH);
-        mafiaGame.setLobby(currLobby);
-        GameStorage.getInstance().setGame(mafiaGame);
+        mafiaGame.setCurrentPlayer(0);
+        mafiaGame.setPlayers(modifiedLobby.getPlayers());
+        //mafiaGame.setTimer();
+        //mafiaGame.setLobby(currLobby);
+        GameStorage.getInstance().setGame(mafiaGame, modifiedLobby.getNumber());
 
         return currLobby;
     }
@@ -237,7 +241,28 @@ public class LobbyService {
         return GameStorage.getInstance().getMafiaGame(number);
     }
 
-    //public
+    public MafiaGame voting(Integer number, CandidateRequest candidateRequest) {
+        MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(number);
+
+
+        return null;
+    }
+
+    private TimerTask setTimer() {
+        return new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("dwd");
+            }
+        };
+    }
+
+    private void startTimer(Integer number) {
+        MafiaGame gameTimer = GameStorage.getInstance().getMafiaGame(number);
+        Timer timer = gameTimer.getTimer();
+        TimerTask timerTask = setTimer();
+        timer.scheduleAtFixedRate(timerTask, 0, 1000);
+    }
 
     public int getRandomNumberUsingNextInt(int min, int max) {
         Random random = new Random();
@@ -254,7 +279,7 @@ public class LobbyService {
 
     public void deleteLobby(Integer id) {
         Lobby currLobby = lobbyRepository.selectCurrentLobbyByPlayerLobbyId(id);
-        Map<Integer, Lobby> lobbyMap= LobbyStorage.getInstance().getLobby();
+        Map<Integer, Lobby> lobbyMap = LobbyStorage.getInstance().getLobby();
         lobbyMap.remove(currLobby.getNumber());
         LobbyStorage.getInstance().setLobbies(lobbyMap);
         playerRepository.deleteByLobbyId(id);

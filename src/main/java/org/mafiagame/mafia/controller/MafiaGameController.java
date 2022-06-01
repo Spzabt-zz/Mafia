@@ -5,7 +5,6 @@ import org.mafiagame.mafia.controller.dto.CandidateRequest;
 import org.mafiagame.mafia.exception.InvalidLobbySizeException;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.game.MafiaGame;
-import org.mafiagame.mafia.model.game.MafiaGamePlay;
 import org.mafiagame.mafia.service.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1")
 public class MafiaGameController {
     private final LobbyService lobbyService;
-    private SimpMessagingTemplate simpleMessageTemplate;
+    private final SimpMessagingTemplate webSocket;
 
     @Autowired
-    public MafiaGameController(LobbyService lobbyService) {
+    public MafiaGameController(LobbyService lobbyService, SimpMessagingTemplate webSocket) {
         this.lobbyService = lobbyService;
+        this.webSocket = webSocket;
     }
 
     @PutMapping("/lobby/{number}/mafia_game")
@@ -36,10 +36,10 @@ public class MafiaGameController {
     }
 
     @PostMapping("/lobby/{number}/candidates")
-    public ResponseEntity candidateNomination(@PathVariable Integer number, @RequestBody CandidateRequest request) {
-
-        //simpleMessageTemplate.convertAndSend("/topic/game-progress/" + number, request);
+    public ResponseEntity<MafiaGame> candidateNomination(@PathVariable Integer number, @RequestBody CandidateRequest request) {
+        MafiaGame mafiaGame = lobbyService.voting(number, request);
+        webSocket.convertAndSend("/topic/game-progress/" + number, mafiaGame);
         log.info("Candidate nominated by number: {}", number);
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.ok(mafiaGame);
     }
 }

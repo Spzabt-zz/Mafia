@@ -13,6 +13,7 @@ import org.mafiagame.mafia.service.LobbyService;
 import org.mafiagame.mafia.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,17 +27,21 @@ import static org.springframework.http.ResponseEntity.status;
 public class LobbyController {
     private final LobbyService lobbyService;
     private final PlayerService playerService;
+    private final SimpMessagingTemplate webSocket;
 
     @Autowired
-    public LobbyController(LobbyService lobbyService, PlayerService playerService) {
+    public LobbyController(LobbyService lobbyService, PlayerService playerService, SimpMessagingTemplate webSocket) {
         this.lobbyService = lobbyService;
         this.playerService = playerService;
+        this.webSocket = webSocket;
     }
 
     @PostMapping("/lobby")
     public ResponseEntity<Lobby> addLobby(@RequestBody CreateLobbyRequest createLobbyRequest) throws InvalidLobbyNumberException, InvalidPlayerNameException {
         log.info("Lobby created: {}", createLobbyRequest);
-        return ResponseEntity.ok(lobbyService.createGameLobby(createLobbyRequest));
+        Lobby lobby = lobbyService.createGameLobby(createLobbyRequest);
+        //webSocket.convertAndSend("/topic/lobby-stuff", lobby);
+        return ResponseEntity.ok(/*lobbyService.createGameLobby(createLobbyRequest)*/lobby);
     }
 
     @GetMapping("/lobby")
@@ -48,7 +53,9 @@ public class LobbyController {
     @PostMapping("/lobby/{number}/players")
     public ResponseEntity<Player> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException, InvalidPlayerNameException, InvalidLobbySizeException {
         log.info("Connect player to lobby: connect req {}, number {}", connectRequest, number);
-        return ResponseEntity.ok(lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number));
+        Player player = lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number);
+        //webSocket.convertAndSend("/topic/lobby-stuff/" + number, player);
+        return ResponseEntity.ok(/*lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number)*/player);
     }
 
     @GetMapping("/lobby/{number}/players")

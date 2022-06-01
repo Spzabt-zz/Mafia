@@ -28,7 +28,7 @@ public class GameStorage {
         return gameSessions;
     }
 
-    public void setGame(MafiaGame game) {
-        gameSessions.put(game.getLobby().getNumber(), game);
+    public void setGame(MafiaGame game, Integer number) {
+        gameSessions.put(number, game);
     }
 }
