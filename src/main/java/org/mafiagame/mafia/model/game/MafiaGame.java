@@ -4,6 +4,7 @@ import lombok.Data;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.model.enam.DayTime;
 import org.mafiagame.mafia.model.enam.Phase;
+import org.mafiagame.mafia.model.enam.WinStatus;
 
 import java.util.List;
 import java.util.Timer;
@@ -16,8 +17,9 @@ public class MafiaGame {
     private Phase phase;
     private Integer currentPlayer;
     private List<Player> players;
+    private WinStatus winStatus;
     private Timer timer;
-    private TimerTask timerTask;
+    //private TimerTask timerTask;
 
     //private Lobby lobby;
     //private Votes votes;

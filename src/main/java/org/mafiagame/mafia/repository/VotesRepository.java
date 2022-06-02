@@ -29,4 +29,8 @@ public class VotesRepository {
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM votes WHERE player_id=?", id);
     }
+
+    public void updatePlayerVotes(Votes votes) {
+        jdbcTemplate.update("UPDATE votes SET candidate_id = ?, day = ? WHERE player_id = ?", votes.getCandidateId(), votes.getDay(), votes.getPlayerId());
+    }
 }

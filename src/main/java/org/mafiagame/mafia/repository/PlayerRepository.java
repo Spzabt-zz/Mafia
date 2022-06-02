@@ -47,4 +47,9 @@ public class PlayerRepository {
     public void updatePlayer(int position, boolean alive, String playerRole, int playerId) {
         jdbcTemplate.update("UPDATE player SET role = ?, alive = ?, position = ? WHERE id = ?", playerRole, alive, position, playerId);
     }
+
+    public void updateFullPlayer(Player player) {
+        jdbcTemplate.update("UPDATE player SET name = ?, role = ?, alive = ?, position = ?, candidate = ?, vote = ?, admin = ?, lobby_id = ? WHERE id = ?",
+                player.getName(), player.getRole(), player.getAlive(), player.getPosition(), player.getCandidate(), player.getVote(), player.getAdmin(), player.getLobbyId(), player.getId());
+    }
 }

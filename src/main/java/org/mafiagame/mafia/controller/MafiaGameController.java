@@ -2,6 +2,7 @@ package org.mafiagame.mafia.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.mafiagame.mafia.controller.dto.CandidateRequest;
+import org.mafiagame.mafia.exception.InvalidGameException;
 import org.mafiagame.mafia.exception.InvalidLobbySizeException;
 import org.mafiagame.mafia.model.Lobby;
 import org.mafiagame.mafia.model.game.MafiaGame;
@@ -29,6 +30,7 @@ public class MafiaGameController {
         log.info("Game started at lobby number: {}", number);
         return ResponseEntity.ok(lobbyService.startGame(number));
     }
+
     @GetMapping("/lobby/{number}/mafia_game")
     public ResponseEntity<MafiaGame> gameStatus(@PathVariable Integer number) {
         log.info("Game status at lobby number: {}", number);
@@ -36,8 +38,9 @@ public class MafiaGameController {
     }
 
     @PostMapping("/lobby/{number}/candidates")
-    public ResponseEntity<MafiaGame> candidateNomination(@PathVariable Integer number, @RequestBody CandidateRequest request) {
-        MafiaGame mafiaGame = lobbyService.voting(number, request);
+    public ResponseEntity<MafiaGame> candidateNomination(@PathVariable Integer number,
+                                                         @RequestParam("player_position") /*CandidateRequest*/Integer player_position) throws InvalidGameException {
+        MafiaGame mafiaGame = lobbyService.civilianVoting(number, player_position);
         webSocket.convertAndSend("/topic/game-progress/" + number, mafiaGame);
         log.info("Candidate nominated by number: {}", number);
         return ResponseEntity.ok(mafiaGame);
