@@ -148,9 +148,9 @@ public class LobbyService {
         lobbyRepository.updateLobbyStatus(number);
 
         MafiaGame mafiaGame = new MafiaGame();
-        mafiaGame.setDay(1);
+        mafiaGame.setDay(0);
         mafiaGame.setDayTime(DayTime.NIGHT);
-        mafiaGame.setPhase(Phase.SPEECH);
+        mafiaGame.setPhase(Phase.MAFIA);
         mafiaGame.setCurrentPlayer(1);
         mafiaGame.setPlayers(modifiedLobby.getPlayers());
         //mafiaGame.setTimer();
@@ -253,8 +253,15 @@ public class LobbyService {
 
         Player player = players.get(mafiaGame.getCurrentPlayer() - 1);
 
-        if (!player.getAlive()) {
+        /*if (!player.getAlive()) {
             player = players.get(mafiaGame.getCurrentPlayer());
+        }*/
+        int counter = 0;
+        while (!player.getAlive()) {
+            if (player.getPosition() != players.size()) {
+                player = players.get(mafiaGame.getCurrentPlayer() + counter);
+                counter++;
+            } else break;
         }
 
         if (mafiaGame.getPhase() != Phase.VOTING) {
@@ -273,11 +280,11 @@ public class LobbyService {
         votedPlayer.setVote(voteCount);
         playerRepository.updateFullPlayer(votedPlayer);
 
-        Player previousPlayer = players.get(mafiaGame.getCurrentPlayer() - 1);
+        /*Player previousPlayer = players.get(mafiaGame.getCurrentPlayer() - 1);
         if (!previousPlayer.getAlive()) {
             if (mafiaGame.getCurrentPlayer() == players.size() - 1) {
                 killPlayerAndCheckWinner(mafiaGame, players, false);
-                /*mafiaGame.setCurrentPlayer(0);
+                *//*mafiaGame.setCurrentPlayer(0);
                 int playerIndexWithBiggestVoteScore = 0;
                 int maxPlayerVoteCount = players.get(0).getVote();
 
@@ -297,36 +304,129 @@ public class LobbyService {
                     mafiaGame.setWinStatus(WinStatus.MAFIA_WIN);
                 }
 
-                playerRepository.updateFullPlayer(killPlayer);*/
+                playerRepository.updateFullPlayer(killPlayer);*//*
+            }*/
+
+        int votee = 0;
+        int cout = 0;
+        for (Player player1 : players) {
+            votee += player1.getVote();
+            if (player1.getAlive()) {
+                cout++;
             }
-        } else if (mafiaGame.getCurrentPlayer() == players.size()) {
-            killPlayerAndCheckWinner(mafiaGame, players, true);
-            /*mafiaGame.setCurrentPlayer(0);
-            int playerIndexWithBiggestVoteScore = 0;
-            int maxPlayerVoteCount = players.get(0).getVote();
-
-            //todo: handle when vote scores are equals
-            for (int i = 1; i < players.size(); i++) {
-                if (players.get(i).getVote() > maxPlayerVoteCount) {
-                    playerIndexWithBiggestVoteScore = players.get(i).getVote();
-                }
-            }
-
-            Player killPlayer = players.get(playerIndexWithBiggestVoteScore);
-            killPlayer.setAlive(false);
-
-            if (checkWinner(players) == WinStatus.FAIR_WIN) {
-                mafiaGame.setWinStatus(WinStatus.FAIR_WIN);
-            } else if (checkWinner(players) == WinStatus.MAFIA_WIN) {
-                mafiaGame.setWinStatus(WinStatus.MAFIA_WIN);
-            }
-
-            playerRepository.updateFullPlayer(killPlayer);*/
         }
 
-        int currentPlayer = mafiaGame.getCurrentPlayer();
-        currentPlayer++;
-        mafiaGame.setCurrentPlayer(currentPlayer);
+        if (votee == cout) {
+            killPlayerAndCheckWinner(mafiaGame, players, true);
+        }
+
+      /*  Player nextPlayer = players.get(mafiaGame.getCurrentPlayer());
+
+        int nextCounter = 0;*/
+
+        int currentPlayer = 0;
+        int playerPos = 0;
+        if (/*player.getPosition() == players.size()*/votee == cout) {
+            for (Player player1 : players) {
+                if (player1.getAlive()) {
+                    playerPos = player1.getPosition();
+                    break;
+                }
+            }
+            mafiaGame.setCurrentPlayer(playerPos);
+            //currentPlayer = playerPos;
+        } else {
+            int deadCounter = 1;
+            Player nextPlayer = players.get(mafiaGame.getCurrentPlayer());
+            if (!nextPlayer.getAlive())
+                for (int i = player.getPosition(); i < players.size(); i++) {
+                    if (!players.get(i).getAlive()) {
+                        if (players.get(i).getAlive())
+                            break;
+                        deadCounter++;
+                    }
+                }
+            /*currentPlayer = player.getPosition() + deadCounter;*/
+            if (player.getPosition() + deadCounter <= players.size())
+                if (players.get(player.getPosition() + deadCounter - 1).getAlive())
+                    currentPlayer = player.getPosition() + deadCounter;
+                else {
+                    for (Player player1 : players) {
+                        if (player1.getAlive()) {
+                            currentPlayer = player1.getPosition();
+                            break;
+                        }
+                    }
+                }
+            mafiaGame.setCurrentPlayer(currentPlayer);
+        }
+
+       /* int counter1 = 0;
+        if (player.getPosition() == players.size()) {
+            for (Player player1 : players) {
+                if (player1.getAlive()) {
+                    mafiaGame.setCurrentPlayer(player1.getPosition());
+                    break;
+                }
+            }
+        } else {
+            if (!players.get(player.getPosition()).getAlive() && (player.getPosition() + 1) <= players.size()) {
+                for (int i = player.getPosition(); i < players.size(); i++) {
+                    if (!players.get(i).getAlive()) {
+                        counter1++;
+                    }
+                }
+                if ((player.getPosition() + counter1) < players.size()) {
+                    mafiaGame.setCurrentPlayer(player.getPosition() + counter1);
+                } else {
+                    for (Player player1 : players) {
+                        if (player1.getAlive()) {
+                            mafiaGame.setCurrentPlayer(player1.getPosition());
+                            break;
+                        }
+                    }
+                }
+            }
+        }*/
+
+        /*for (int i = player.getPosition() - 1; i < players.size(); i++) {
+            if (player.getPosition() == players.size()) {
+                mafiaGame.setCurrentPlayer(1);
+            }
+            if (players.get(i).getAlive()) {
+                mafiaGame.setCurrentPlayer(players.get(i).getPosition() + 1);
+                break;
+            }
+        }*/
+
+        /*while (!player.getAlive()) {
+            if (player.getPosition() != players.size()) {
+                player = players.get(mafiaGame.getCurrentPlayer());
+
+                int currentPlayer;
+                currentPlayer = player.getPosition();
+                mafiaGame.setCurrentPlayer(currentPlayer);
+
+            } else {
+                int currentPlayer = mafiaGame.getCurrentPlayer();
+                currentPlayer++;
+                mafiaGame.setCurrentPlayer(currentPlayer);
+                break;
+            }
+        }*/
+
+       /* if (!nextPlayer.getAlive()) {
+            //while (!nextPlayer.getAlive()) {
+            int currentPlayer = mafiaGame.getCurrentPlayer();
+            currentPlayer++;
+            mafiaGame.setCurrentPlayer(currentPlayer);
+            //}
+        }
+        else {
+            int currentPlayer = mafiaGame.getCurrentPlayer();
+            currentPlayer++;
+            mafiaGame.setCurrentPlayer(currentPlayer);
+        }*/
 
         GameStorage.getInstance().setGame(mafiaGame, number);
 
@@ -336,27 +436,49 @@ public class LobbyService {
     private void killPlayerAndCheckWinner(MafiaGame mafiaGame, List<Player> players, boolean flag) {
         mafiaGame.setCurrentPlayer(0);
         int playerIndexWithBiggestVoteScore = 0;
+        int counter = 0;
         int maxPlayerVoteCount = players.get(0).getVote();
+        //int secondMaxPlayerVoteCount = players.get(0).getVote();
 
-        //todo: handle when vote scores are equals
         for (int i = 1; i < players.size(); i++) {
             if (players.get(i).getVote() > maxPlayerVoteCount) {
                 playerIndexWithBiggestVoteScore = players.get(i).getVote();
+                maxPlayerVoteCount = players.get(i).getVote();
             }
         }
 
-        Player killPlayer;
-        if (flag) killPlayer = players.get(playerIndexWithBiggestVoteScore);
-        else killPlayer = players.get(playerIndexWithBiggestVoteScore - 1);//todo: fix bag - out of bound exception
-        killPlayer.setAlive(false);
-
-        if (checkWinner(players) == WinStatus.FAIR_WIN) {
-            mafiaGame.setWinStatus(WinStatus.FAIR_WIN);
-        } else if (checkWinner(players) == WinStatus.MAFIA_WIN) {
-            mafiaGame.setWinStatus(WinStatus.MAFIA_WIN);
+        int playerIndex = 0;
+        for (Player player : players) {
+            if (player.getVote() == playerIndexWithBiggestVoteScore) {
+                playerIndex = player.getPosition();
+            }
         }
 
-        playerRepository.updateFullPlayer(killPlayer);
+        for (int i = 1; i < players.size(); i++) {
+            if (players.get(i).getVote() == maxPlayerVoteCount) {
+                counter++;
+            }
+        }
+
+        if (counter < 2) {
+            Player killPlayer;
+            /*if (flag)*/
+            killPlayer = players.get(playerIndex - 1);
+            /*else killPlayer = players.get(playerIndexWithBiggestVoteScore - 1);//todo: fix bag - out of bound exception*/
+            killPlayer.setAlive(false);
+
+            if (checkWinner(players) == WinStatus.FAIR_WIN) {
+                mafiaGame.setWinStatus(WinStatus.FAIR_WIN);
+            } else if (checkWinner(players) == WinStatus.MAFIA_WIN) {
+                mafiaGame.setWinStatus(WinStatus.MAFIA_WIN);
+            }
+
+            for (Player player : players) {
+                player.setVote(0);
+            }
+
+            playerRepository.updateFullPlayer(killPlayer);
+        }
     }
 
     //todo: reset lobby after game session && reset votes as well
