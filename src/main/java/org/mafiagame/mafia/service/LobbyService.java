@@ -136,7 +136,7 @@ public class LobbyService {
                 .collect(Collectors.toList());
     }
 
-    //todo: change method, implement timer?
+    //todo: change method, implement timer
     public Lobby startGame(Integer number) throws InvalidLobbySizeException {
         if (LobbyStorage.getInstance().getLobby().get(number).getPlayers().size() < MIN_COUNT_PLAYERS_IN_LOBBY) {
             throw new InvalidLobbySizeException("Min players in lobby " + MIN_COUNT_PLAYERS_IN_LOBBY + ". Invite more people");
@@ -153,9 +153,10 @@ public class LobbyService {
         mafiaGame.setPhase(Phase.MAFIA);
         mafiaGame.setCurrentPlayer(1);
         mafiaGame.setPlayers(modifiedLobby.getPlayers());
-        //mafiaGame.setTimer();
-        //mafiaGame.setLobby(currLobby);
         GameStorage.getInstance().setGame(mafiaGame, modifiedLobby.getNumber());
+
+        TestTimer timer = new TestTimer();
+        timer.start();
 
         return currLobby;
     }
@@ -164,9 +165,6 @@ public class LobbyService {
         int count = 0;
         int playerCount = lobby.getPlayers().size();
         List<String> listOfPlayerRoles = null;
-
-        /*int s = 1;
-        int x = (playerCount * 2 - 3) / 3;*/
 
         int sheriffCount = 1;
         switch (playerCount) {
@@ -234,7 +232,7 @@ public class LobbyService {
         return GameStorage.getInstance().getMafiaGame(number);
     }
 
-    //todo: implement timer?
+    //todo: implement timer
     public MafiaGame civilianVoting(Integer number, Integer candidateId) throws InvalidGameException {
         MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(number);
         List<Player> players = mafiaGame.getPlayers();
@@ -253,9 +251,6 @@ public class LobbyService {
 
         Player player = players.get(mafiaGame.getCurrentPlayer() - 1);
 
-        /*if (!player.getAlive()) {
-            player = players.get(mafiaGame.getCurrentPlayer());
-        }*/
         int counter = 0;
         while (!player.getAlive()) {
             if (player.getPosition() != players.size()) {
@@ -280,53 +275,22 @@ public class LobbyService {
         votedPlayer.setVote(voteCount);
         playerRepository.updateFullPlayer(votedPlayer);
 
-        /*Player previousPlayer = players.get(mafiaGame.getCurrentPlayer() - 1);
-        if (!previousPlayer.getAlive()) {
-            if (mafiaGame.getCurrentPlayer() == players.size() - 1) {
-                killPlayerAndCheckWinner(mafiaGame, players, false);
-                *//*mafiaGame.setCurrentPlayer(0);
-                int playerIndexWithBiggestVoteScore = 0;
-                int maxPlayerVoteCount = players.get(0).getVote();
-
-                //todo: handle when vote scores are equals
-                for (int i = 1; i < players.size(); i++) {
-                    if (players.get(i).getVote() > maxPlayerVoteCount) {
-                        playerIndexWithBiggestVoteScore = players.get(i).getVote();
-                    }
-                }
-
-                Player killPlayer = players.get(playerIndexWithBiggestVoteScore);
-                killPlayer.setAlive(false);
-
-                if (checkWinner(players) == WinStatus.FAIR_WIN) {
-                    mafiaGame.setWinStatus(WinStatus.FAIR_WIN);
-                } else if (checkWinner(players) == WinStatus.MAFIA_WIN) {
-                    mafiaGame.setWinStatus(WinStatus.MAFIA_WIN);
-                }
-
-                playerRepository.updateFullPlayer(killPlayer);*//*
-            }*/
-
-        int votee = 0;
-        int cout = 0;
+        int aliveVotes = 0;
+        int alivePlayersCount = 0;
         for (Player player1 : players) {
-            votee += player1.getVote();
+            aliveVotes += player1.getVote();
             if (player1.getAlive()) {
-                cout++;
+                alivePlayersCount++;
             }
         }
 
-        if (votee == cout) {
-            killPlayerAndCheckWinner(mafiaGame, players, true);
+        if (aliveVotes == alivePlayersCount) {
+            killPlayerAndCheckWinner(mafiaGame, players);
         }
-
-      /*  Player nextPlayer = players.get(mafiaGame.getCurrentPlayer());
-
-        int nextCounter = 0;*/
 
         int currentPlayer = 0;
         int playerPos = 0;
-        if (/*player.getPosition() == players.size()*/votee == cout) {
+        if (player.getPosition() == players.size()) {
             for (Player player1 : players) {
                 if (player1.getAlive()) {
                     playerPos = player1.getPosition();
@@ -334,16 +298,25 @@ public class LobbyService {
                 }
             }
             mafiaGame.setCurrentPlayer(playerPos);
-            //currentPlayer = playerPos;
         } else {
             int deadCounter = 1;
             Player nextPlayer = players.get(mafiaGame.getCurrentPlayer());
             if (!nextPlayer.getAlive())
                 for (int i = player.getPosition(); i < players.size(); i++) {
                     if (!players.get(i).getAlive()) {
-                        if (players.get(i).getAlive())
-                            break;
-                        deadCounter++;
+                        //deadCounter++
+                        if (players.get(i).getPosition() != players.size()) {
+                            if (players.get(i + 1).getAlive()) {
+                                deadCounter++;
+                                if (!players.get(i).getAlive()) {
+                                    break;
+                                }
+                                break;
+                            }
+                            else {
+                                deadCounter++;
+                            }
+                        }
                     }
                 }
             /*currentPlayer = player.getPosition() + deadCounter;*/
@@ -360,88 +333,19 @@ public class LobbyService {
                 }
             mafiaGame.setCurrentPlayer(currentPlayer);
         }
-
-       /* int counter1 = 0;
-        if (player.getPosition() == players.size()) {
-            for (Player player1 : players) {
-                if (player1.getAlive()) {
-                    mafiaGame.setCurrentPlayer(player1.getPosition());
-                    break;
-                }
-            }
-        } else {
-            if (!players.get(player.getPosition()).getAlive() && (player.getPosition() + 1) <= players.size()) {
-                for (int i = player.getPosition(); i < players.size(); i++) {
-                    if (!players.get(i).getAlive()) {
-                        counter1++;
-                    }
-                }
-                if ((player.getPosition() + counter1) < players.size()) {
-                    mafiaGame.setCurrentPlayer(player.getPosition() + counter1);
-                } else {
-                    for (Player player1 : players) {
-                        if (player1.getAlive()) {
-                            mafiaGame.setCurrentPlayer(player1.getPosition());
-                            break;
-                        }
-                    }
-                }
-            }
-        }*/
-
-        /*for (int i = player.getPosition() - 1; i < players.size(); i++) {
-            if (player.getPosition() == players.size()) {
-                mafiaGame.setCurrentPlayer(1);
-            }
-            if (players.get(i).getAlive()) {
-                mafiaGame.setCurrentPlayer(players.get(i).getPosition() + 1);
-                break;
-            }
-        }*/
-
-        /*while (!player.getAlive()) {
-            if (player.getPosition() != players.size()) {
-                player = players.get(mafiaGame.getCurrentPlayer());
-
-                int currentPlayer;
-                currentPlayer = player.getPosition();
-                mafiaGame.setCurrentPlayer(currentPlayer);
-
-            } else {
-                int currentPlayer = mafiaGame.getCurrentPlayer();
-                currentPlayer++;
-                mafiaGame.setCurrentPlayer(currentPlayer);
-                break;
-            }
-        }*/
-
-       /* if (!nextPlayer.getAlive()) {
-            //while (!nextPlayer.getAlive()) {
-            int currentPlayer = mafiaGame.getCurrentPlayer();
-            currentPlayer++;
-            mafiaGame.setCurrentPlayer(currentPlayer);
-            //}
-        }
-        else {
-            int currentPlayer = mafiaGame.getCurrentPlayer();
-            currentPlayer++;
-            mafiaGame.setCurrentPlayer(currentPlayer);
-        }*/
-
         GameStorage.getInstance().setGame(mafiaGame, number);
 
         return mafiaGame;
     }
 
-    private void killPlayerAndCheckWinner(MafiaGame mafiaGame, List<Player> players, boolean flag) {
+    private void killPlayerAndCheckWinner(MafiaGame mafiaGame, List<Player> players) {
         mafiaGame.setCurrentPlayer(0);
         int playerIndexWithBiggestVoteScore = 0;
         int counter = 0;
         int maxPlayerVoteCount = players.get(0).getVote();
-        //int secondMaxPlayerVoteCount = players.get(0).getVote();
 
-        for (int i = 1; i < players.size(); i++) {
-            if (players.get(i).getVote() > maxPlayerVoteCount) {
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).getVote() >= maxPlayerVoteCount) {
                 playerIndexWithBiggestVoteScore = players.get(i).getVote();
                 maxPlayerVoteCount = players.get(i).getVote();
             }
@@ -462,9 +366,7 @@ public class LobbyService {
 
         if (counter < 2) {
             Player killPlayer;
-            /*if (flag)*/
             killPlayer = players.get(playerIndex - 1);
-            /*else killPlayer = players.get(playerIndexWithBiggestVoteScore - 1);//todo: fix bag - out of bound exception*/
             killPlayer.setAlive(false);
 
             if (checkWinner(players) == WinStatus.FAIR_WIN) {
@@ -499,7 +401,6 @@ public class LobbyService {
                 }
             }
         }
-        //todo: mafia always wins - fix
         if (mafiaCount == civilianCount) {
             return WinStatus.MAFIA_WIN;
         }
@@ -510,28 +411,23 @@ public class LobbyService {
         return null;
     }
 
-    private TimerTask setTimer() {
-        return new TimerTask() {
-            @Override
-            public void run() {
-                System.out.println("is running");
-            }
-        };
-    }
-
-    private void startTimer(Integer number) {
-        MafiaGame gameTimer = GameStorage.getInstance().getMafiaGame(number);
-
-        /*Thread thread = new Thread(new LongRunningTask());
-        thread.start();
+    private static class TestTimer {
+        int seconds = 0;
 
         Timer timer = new Timer();
-        TimeOutTask timeOutTask = new TimeOutTask(thread, timer);
-        timer.schedule(timeOutTask, 3000);*/
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                seconds++;
+                if (seconds >= 60) {
+                    timer.cancel();
+                }
+            }
+        };
 
-        Timer timer = gameTimer.getTimer();
-        TimerTask timerTask = setTimer();
-        timer.scheduleAtFixedRate(timerTask, 0, 1000);
+        public void start() {
+            timer.scheduleAtFixedRate(timerTask, 1000, 1000);
+        }
     }
 
     public int getRandomNumberUsingNextInt(int min, int max) {
