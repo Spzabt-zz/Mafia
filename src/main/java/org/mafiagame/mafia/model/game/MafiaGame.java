@@ -1,5 +1,6 @@
 package org.mafiagame.mafia.model.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.mafiagame.mafia.model.Player;
 import org.mafiagame.mafia.model.enam.DayTime;
@@ -7,8 +8,6 @@ import org.mafiagame.mafia.model.enam.Phase;
 import org.mafiagame.mafia.model.enam.WinStatus;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Data
 public class MafiaGame {
@@ -18,9 +17,11 @@ public class MafiaGame {
     private Integer currentPlayer;
     private List<Player> players;
     private WinStatus winStatus;
-    private Timer timer;
-    //private TimerTask timerTask;
+    private Boolean timerIsWorking;
 
-    //private Lobby lobby;
-    //private Votes votes;
+    @JsonIgnore
+    private GameTimer gameTimer;
+
+    @JsonIgnore
+    private Boolean isFirstPlayer;
 }

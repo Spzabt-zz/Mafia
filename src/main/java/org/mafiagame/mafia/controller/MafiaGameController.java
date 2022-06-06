@@ -37,9 +37,17 @@ public class MafiaGameController {
         return ResponseEntity.ok(lobbyService.getGameStatus(number));
     }
 
+    @PostMapping("/lobby/{number}/speech")
+    public ResponseEntity<MafiaGame> gameSpeech(@PathVariable Integer number) throws InvalidGameException {
+        MafiaGame mafiaGame = lobbyService.speech(number);
+        //webSocket.convertAndSend("/topic/game-progress/" + number, mafiaGame);
+        log.info("Candidate is speaking by number: {}", number);
+        return ResponseEntity.ok(mafiaGame);
+    }
+
     @PostMapping("/lobby/{number}/candidates")
     public ResponseEntity<MafiaGame> candidateNomination(@PathVariable Integer number,
-                                                         @RequestParam("player_position") /*CandidateRequest*/Integer player_position) throws InvalidGameException {
+                                                         @RequestParam("player_position") Integer player_position) throws InvalidGameException {
         MafiaGame mafiaGame = lobbyService.civilianVoting(number, player_position);
         webSocket.convertAndSend("/topic/game-progress/" + number, mafiaGame);
         log.info("Candidate nominated by number: {}", number);
