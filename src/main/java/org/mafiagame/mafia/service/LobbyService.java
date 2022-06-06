@@ -243,10 +243,10 @@ public class LobbyService {
         List<Player> players = mafiaGame.getPlayers();
         GameTimer gameTimer = mafiaGame.getGameTimer();
 
-        if (!gameTimer.isSpeechIsWorking()) {
-            if (!mafiaGame.getTimerIsWorking()) {
-                mafiaGame.setGameTimer(new GameTimer(number));
-                gameTimer.startTimerForVoting();
+        //if (!gameTimer.isSpeechIsWorking()) {
+            //if (!mafiaGame.getTimerIsWorking()) {
+                //mafiaGame.setGameTimer(new GameTimer(number));
+                //gameTimer.startTimerForVoting();
 
                 if (candidateId < 1 || candidateId > players.size()) {
                     throw new InvalidGameException("Candidate not found");
@@ -344,14 +344,14 @@ public class LobbyService {
                     mafiaGame.setCurrentPlayer(currentPlayer);
                 }
                 GameStorage.getInstance().setGame(mafiaGame, number);
-            }
-        }
-        if (gameTimer.isStartGameIsWorking()) {
+            //}
+        //}
+        /*if (gameTimer.isStartGameIsWorking()) {
             throw new InvalidGameException("Wait till players finish their speech");
         }
         if (mafiaGame.getTimerIsWorking()) {
             throw new InvalidGameException("Wait till player " + mafiaGame.getCurrentPlayer() + " finish his voting");
-        }
+        }*/
 
         return mafiaGame;
     }

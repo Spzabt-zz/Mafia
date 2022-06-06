@@ -32,7 +32,7 @@ public class GameTimer {
             startGameIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setTimerIsWorking(startGameIsWorking);
-            if (seconds >= 10) {
+            if (seconds >= 20) {
                 startGameIsWorking = false;
                 mafiaGame.setTimerIsWorking(startGameIsWorking);
                 startTimer.cancel();
@@ -53,7 +53,7 @@ public class GameTimer {
             speechIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setTimerIsWorking(speechIsWorking);
-            if (seconds >= 10) {
+            if (seconds >= 20) {
                 speechIsWorking = false;
                 mafiaGame.setTimerIsWorking(speechIsWorking);
                 speechTimer.cancel();
