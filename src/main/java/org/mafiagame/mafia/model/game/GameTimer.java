@@ -8,16 +8,18 @@ import java.util.TimerTask;
 
 public class GameTimer {
     private final int gameNumber;
-    //private int seconds = 0;
+    private int oneMinute = 60;
     private boolean startGameIsWorking = false;
     private boolean speechIsWorking = false;
     private boolean votingIsWorking = false;
+    private boolean isAheadOfSchedule;
     private final Timer startTimer;
     private final Timer speechTimer;
     private final Timer voteTimer;
 
-    public GameTimer(int gameNumber) {
+    public GameTimer(int gameNumber, boolean isAheadOfSchedule) {
         this.gameNumber = gameNumber;
+        this.isAheadOfSchedule = isAheadOfSchedule;
         startTimer = new Timer();
         speechTimer = new Timer();
         voteTimer = new Timer();
@@ -32,10 +34,12 @@ public class GameTimer {
             startGameIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setTimerIsWorking(startGameIsWorking);
-            if (seconds >= 20) {
+            if (seconds >= 10) {
                 startGameIsWorking = false;
                 mafiaGame.setTimerIsWorking(startGameIsWorking);
+                //oneMinute = 60;
                 startTimer.cancel();
+                startTimer.purge();
             }
         }
     };
@@ -49,14 +53,17 @@ public class GameTimer {
 
         @Override
         public void run() {
+
             seconds++;
             speechIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setTimerIsWorking(speechIsWorking);
-            if (seconds >= 20) {
+            if (seconds >= oneMinute || mafiaGame.getGameTimer().isAheadOfSchedule()) {
                 speechIsWorking = false;
                 mafiaGame.setTimerIsWorking(speechIsWorking);
+                //oneMinute = 60;
                 speechTimer.cancel();
+                startTimer.purge();
             }
         }
     };
@@ -74,10 +81,11 @@ public class GameTimer {
             votingIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setTimerIsWorking(votingIsWorking);
-            if (seconds >= 60) {
+            if (seconds >= oneMinute || mafiaGame.getGameTimer().isAheadOfSchedule()) {
                 votingIsWorking = false;
                 mafiaGame.setTimerIsWorking(votingIsWorking);
                 voteTimer.cancel();
+                voteTimer.purge();
             }
         }
     };
@@ -126,16 +134,24 @@ public class GameTimer {
         return voteTimer;
     }
 
+    public boolean isAheadOfSchedule() {
+        return isAheadOfSchedule;
+    }
+
+    public void setAheadOfSchedule(boolean aheadOfSchedule) {
+        isAheadOfSchedule = aheadOfSchedule;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GameTimer gameTimer = (GameTimer) o;
-        return gameNumber == gameTimer.gameNumber && startGameIsWorking == gameTimer.startGameIsWorking && speechIsWorking == gameTimer.speechIsWorking && votingIsWorking == gameTimer.votingIsWorking && Objects.equals(startTimer, gameTimer.startTimer) && Objects.equals(speechTimer, gameTimer.speechTimer) && Objects.equals(voteTimer, gameTimer.voteTimer) && Objects.equals(timerTaskSeeYourRoles, gameTimer.timerTaskSeeYourRoles) && Objects.equals(timerTaskSpeech, gameTimer.timerTaskSpeech);
+        return gameNumber == gameTimer.gameNumber && oneMinute == gameTimer.oneMinute && startGameIsWorking == gameTimer.startGameIsWorking && speechIsWorking == gameTimer.speechIsWorking && votingIsWorking == gameTimer.votingIsWorking && isAheadOfSchedule == gameTimer.isAheadOfSchedule && Objects.equals(startTimer, gameTimer.startTimer) && Objects.equals(speechTimer, gameTimer.speechTimer) && Objects.equals(voteTimer, gameTimer.voteTimer) && Objects.equals(timerTaskSeeYourRoles, gameTimer.timerTaskSeeYourRoles) && Objects.equals(timerTaskSpeech, gameTimer.timerTaskSpeech) && Objects.equals(timerTaskVoting, gameTimer.timerTaskVoting);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(gameNumber, startGameIsWorking, speechIsWorking, votingIsWorking, startTimer, speechTimer, voteTimer, timerTaskSeeYourRoles, timerTaskSpeech);
+        return Objects.hash(gameNumber, oneMinute, startGameIsWorking, speechIsWorking, votingIsWorking, isAheadOfSchedule, startTimer, speechTimer, voteTimer, timerTaskSeeYourRoles, timerTaskSpeech, timerTaskVoting);
     }
 }

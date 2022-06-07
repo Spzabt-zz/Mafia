@@ -24,4 +24,10 @@ public class MafiaGame {
 
     @JsonIgnore
     private Boolean isFirstPlayer;
+
+    @JsonIgnore
+    private int localCounter;
+
+    @JsonIgnore
+    private Boolean isLastPlayer;
 }
