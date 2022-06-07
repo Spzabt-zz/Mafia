@@ -159,6 +159,7 @@ public class LobbyService {
         mafiaGame.setGameTimer(new GameTimer(number, false));
         mafiaGame.setIsFirstPlayer(true);
         mafiaGame.setIsLastPlayer(false);
+        mafiaGame.setPlayerIsMafia(false);
 
         GameTimer timer = mafiaGame.getGameTimer();
         timer.startTimerForStartGame();
@@ -299,29 +300,19 @@ public class LobbyService {
                     }
                 }
 
+                findCurrentPlayer(player, players, mafiaGame);
+
                 if (aliveVotes == alivePlayersCount) {
                     killPlayerAndCheckWinner(mafiaGame, players);
                     mafiaGame.setDayTime(DayTime.NIGHT);
                     mafiaGame.setPhase(Phase.MAFIA);
                     for (Player player1 : players) {
-                        if(Objects.equals(player1.getRole(), PlayerRole.MAFIA.toString()) && player1.getAlive())
+                        if(Objects.equals(player1.getRole(), PlayerRole.MAFIA.toString()) && player1.getAlive()) {
                             mafiaGame.setCurrentPlayer(player1.getPosition());
+                            break;
+                        }
                     }
                 }
-
-                if (Objects.equals(mafiaGame.getCurrentPlayer(), findLastPlayer(players).getPosition())) {
-                    mafiaGame.setIsLastPlayer(true);
-                }
-
-                //if (!mafiaGame.getIsFirstPlayer()) {
-                    if (!mafiaGame.getIsLastPlayer())
-                        findCurrentPlayer(player, players, mafiaGame);
-                    else {
-                        mafiaGame.setIsFirstPlayer(true);
-                        mafiaGame.setCurrentPlayer(1);
-                        throw new InvalidGameException("Last player already spoke");
-                    }
-                //}
 
                 mafiaGame.setIsLastPlayer(false);
                 //mafiaGame.setIsFirstPlayer(false);
@@ -517,10 +508,6 @@ public class LobbyService {
             }
         }
 
-        if (aliveVotes == aliveMafiaPlayersCount) {
-            killPlayerAndCheckWinner(mafiaGame, players);
-        }
-
         boolean nextMafia = false;
         int playerPos = 0;
         if (player.getPosition() == players.size()) {
@@ -551,56 +538,59 @@ public class LobbyService {
 
         }
 
-        /*int currentPlayer = 0;
-        int playerPos = 0;
-        if (player.getPosition() == players.size()) {
-            for (Player player1 : players) {
-                if (player1.getAlive() && Objects.equals(player1.getRole(), PlayerRole.MAFIA.toString())) {
-                    playerPos = player1.getPosition();
-                    break;
-                }
-            }
-            mafiaGame.setCurrentPlayer(playerPos);
-        } else {
-            int deadCounter = 1;
-            Player nextPlayer = players.get(mafiaGame.getCurrentPlayer());
-            if (!nextPlayer.getAlive() && !Objects.equals(nextPlayer.getRole(), PlayerRole.MAFIA.toString()))
-                for (int i = player.getPosition(); i < players.size(); i++) {
-                    if (!players.get(i).getAlive() && !Objects.equals(nextPlayer.getRole(), PlayerRole.MAFIA.toString())) {
-                        //deadCounter++
-                        if (players.get(i).getPosition() != players.size()) {
-                            if (players.get(i + 1).getAlive() && Objects.equals(nextPlayer.getRole(), PlayerRole.MAFIA.toString())) {
-                                deadCounter++;
-                                if (!players.get(i).getAlive() && !Objects.equals(nextPlayer.getRole(), PlayerRole.MAFIA.toString())) {
-                                    break;
-                                }
-                                break;
-                            } else {
-                                deadCounter++;
-                            }
-                        }
-                    }
-                }
-            if (player.getPosition() + deadCounter <= players.size())
-                if (players.get(player.getPosition() + deadCounter - 1).getAlive() && Objects.equals(nextPlayer.getRole(), PlayerRole.MAFIA.toString()))
-                    currentPlayer = player.getPosition() + deadCounter;
-                else {
-                    for (Player player1 : players) {
-                        if (player1.getAlive() && Objects.equals(nextPlayer.getRole(), PlayerRole.MAFIA.toString())) {
-                            currentPlayer = player1.getPosition();
-                            break;
-                        }
-                    }
-                }
-            mafiaGame.setCurrentPlayer(currentPlayer);
-        }*/
+        if (aliveVotes == aliveMafiaPlayersCount) {
+            killPlayerAndCheckWinner(mafiaGame, players);
+            mafiaGame.setPhase(Phase.SHERIFF);
+        }
+
         GameStorage.getInstance().setGame(mafiaGame, number);
 
         return mafiaGame;
     }
 
-    public MafiaGame sheriffTurn() {
-        return null;
+    public MafiaGame sheriffTurn(Integer number, Integer candidateId) throws InvalidGameException {
+        MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(number);
+        List<Player> players = mafiaGame.getPlayers();
+        GameTimer gameTimer = mafiaGame.getGameTimer();
+
+        if (candidateId < 1 || candidateId > players.size()) {
+            throw new InvalidGameException("Candidate not found");
+        }
+        for (Player player : players) {
+            if (Objects.equals(player.getPosition(), candidateId) && !player.getAlive()) {
+                throw new InvalidGameException("Player: " + player.getName() + " at position " + candidateId + " already killed");
+            }
+        }
+        if (Objects.equals(mafiaGame.getCurrentPlayer(), candidateId)) {
+            throw new InvalidGameException("Sheriff can't check for himself");
+        }
+
+        Player player = players.get(mafiaGame.getCurrentPlayer() - 1);
+
+        if (mafiaGame.getPhase() != Phase.SHERIFF) {
+            mafiaGame.setDayTime(DayTime.NIGHT);
+            mafiaGame.setPhase(Phase.SHERIFF);
+        }
+
+        if (player.getAlive()) {
+            if (Objects.equals(players.get(candidateId - 1).getRole(), PlayerRole.MAFIA.toString())) {
+                mafiaGame.setPlayerIsMafia(true);
+            } else
+                mafiaGame.setPlayerIsMafia(false);
+            mafiaGame.setDayTime(DayTime.DAY);
+            mafiaGame.setDay(mafiaGame.getDay() + 1);
+            mafiaGame.setPhase(Phase.SPEECH);
+            for (Player player1 : players) {
+                if (player1.getAlive()) {
+                    mafiaGame.setCurrentPlayer(player1.getPosition());
+                    break;
+                }
+            }
+        }
+
+        GameStorage.getInstance().setGame(mafiaGame, number);
+
+        return mafiaGame;
     }
 
     public void abstainVote(Integer number) {

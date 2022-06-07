@@ -75,4 +75,13 @@ public class MafiaGameController {
         log.info("Mafia nominated by number: {}", number);
         return ResponseEntity.ok(mafiaGame);
     }
+
+    @PostMapping("/lobby/{number}/sheriff_turn")
+    public ResponseEntity<MafiaGame> sheriffCheck(@PathVariable Integer number,
+                                                     @RequestParam("player_position") Integer player_position) throws InvalidGameException {
+        MafiaGame mafiaGame = lobbyService.sheriffTurn(number, player_position);
+        webSocket.convertAndSend("/topic/game-progress/" + number, mafiaGame);
+        log.info("Sheriff checked by number: {}", number);
+        return ResponseEntity.ok(mafiaGame);
+    }
 }

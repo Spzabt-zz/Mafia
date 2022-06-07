@@ -18,6 +18,7 @@ public class MafiaGame {
     private List<Player> players;
     private WinStatus winStatus;
     private Boolean timerIsWorking;
+    private Boolean playerIsMafia;
 
     @JsonIgnore
     private GameTimer gameTimer;
