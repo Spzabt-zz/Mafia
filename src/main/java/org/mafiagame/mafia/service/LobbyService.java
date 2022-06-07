@@ -521,7 +521,37 @@ public class LobbyService {
             killPlayerAndCheckWinner(mafiaGame, players);
         }
 
-        int currentPlayer = 0;
+        boolean nextMafia = false;
+        int playerPos = 0;
+        if (player.getPosition() == players.size()) {
+            for (Player player1 : players) {
+                if (player1.getAlive() && Objects.equals(player1.getRole(), PlayerRole.MAFIA.toString())) {
+                    playerPos = player1.getPosition();
+                    break;
+                }
+            }
+            mafiaGame.setCurrentPlayer(playerPos);
+        } else {
+            for (int i = player.getPosition(); i < players.size(); i++) {
+                if (players.get(i).getAlive() && Objects.equals(players.get(i).getRole(), PlayerRole.MAFIA.toString())) {
+                    mafiaGame.setCurrentPlayer(players.get(i).getPosition());
+                    nextMafia = true;
+                    break;
+                }
+                if (i == players.size() - 1 && !nextMafia) {
+                    for (Player player1 : players) {
+                        if (player1.getAlive() && Objects.equals(player1.getRole(), PlayerRole.MAFIA.toString())) {
+                            playerPos = player1.getPosition();
+                            break;
+                        }
+                    }
+                    mafiaGame.setCurrentPlayer(playerPos);
+                }
+            }
+
+        }
+
+        /*int currentPlayer = 0;
         int playerPos = 0;
         if (player.getPosition() == players.size()) {
             for (Player player1 : players) {
@@ -563,7 +593,7 @@ public class LobbyService {
                     }
                 }
             mafiaGame.setCurrentPlayer(currentPlayer);
-        }
+        }*/
         GameStorage.getInstance().setGame(mafiaGame, number);
 
         return mafiaGame;
