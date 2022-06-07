@@ -41,7 +41,7 @@ public class LobbyRepository {
         jdbcTemplate.update("DELETE FROM lobby WHERE id=?", id);
     }
 
-    public void updateLobbyStatus(int number) {
-        jdbcTemplate.update("UPDATE lobby SET game_status = ? WHERE number = ?", GameStatus.IN_PROGRESS.toString(), number);
+    public void updateLobbyStatus(int number, String gameStatus) {
+        jdbcTemplate.update("UPDATE lobby SET game_status = ? WHERE number = ?", gameStatus, number);
     }
 }

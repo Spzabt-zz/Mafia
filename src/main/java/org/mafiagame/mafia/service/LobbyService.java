@@ -147,7 +147,7 @@ public class LobbyService {
         currLobby.setGameStatus(GameStatus.IN_PROGRESS.toString());
         Lobby modifiedLobby = setPlayerStats(currLobby);
         LobbyStorage.getInstance().setLobby(modifiedLobby);
-        lobbyRepository.updateLobbyStatus(number);
+        lobbyRepository.updateLobbyStatus(number, GameStatus.IN_PROGRESS.toString());
 
         MafiaGame mafiaGame = new MafiaGame();
         mafiaGame.setDay(1);
@@ -302,7 +302,7 @@ public class LobbyService {
         findCurrentPlayer(player, players, mafiaGame);
 
         if (aliveVotes == alivePlayersCount) {
-            killPlayerAndCheckWinner(mafiaGame, players);
+            killPlayerAndCheckWinner(mafiaGame, players, number);
             mafiaGame.setDayTime(DayTime.NIGHT);
             mafiaGame.setPhase(Phase.MAFIA);
             for (Player player1 : players) {
@@ -321,7 +321,7 @@ public class LobbyService {
         return mafiaGame;
     }
 
-    private void killPlayerAndCheckWinner(MafiaGame mafiaGame, List<Player> players) {
+    private void killPlayerAndCheckWinner(MafiaGame mafiaGame, List<Player> players, Integer number) {
         mafiaGame.setCurrentPlayer(0);
         int playerIndexWithBiggestVoteScore = 0;
         int counter = 0;
@@ -352,10 +352,19 @@ public class LobbyService {
             killPlayer = players.get(playerIndex - 1);
             killPlayer.setAlive(false);
 
+            Lobby lobby = LobbyStorage.getInstance().getLobby().get(number);
             if (checkWinner(players) == WinStatus.FAIR_WIN) {
                 mafiaGame.setWinStatus(WinStatus.FAIR_WIN);
+                lobby.setGameStatus(GameStatus.FINISHED.toString());
+                LobbyStorage.getInstance().setLobby(lobby);
+                lobbyRepository.updateLobbyStatus(number, GameStatus.FINISHED.toString());
+                resetLobby(number);
             } else if (checkWinner(players) == WinStatus.MAFIA_WIN) {
                 mafiaGame.setWinStatus(WinStatus.MAFIA_WIN);
+                lobby.setGameStatus(GameStatus.FINISHED.toString());
+                LobbyStorage.getInstance().setLobby(lobby);
+                lobbyRepository.updateLobbyStatus(number, GameStatus.FINISHED.toString());
+                resetLobby(number);
             }
 
             for (Player player : players) {
@@ -366,8 +375,22 @@ public class LobbyService {
         }
     }
 
-    //todo: reset lobby after game session && reset votes as well
-    private void resetLobby() {
+    private void resetLobby(Integer number) {
+        Lobby lobby = LobbyStorage.getInstance().getLobby().get(number);
+        if (Objects.equals(lobby.getGameStatus(), GameStatus.FINISHED.toString())) {
+            List<Player> players = lobby.getPlayers();
+            for (Player player : players) {
+                player.setRole(PlayerRole.DEFAULT.toString());
+                player.setAlive(false);
+                player.setPosition(0);
+                player.setCandidate(false);
+                player.setVote(0);
+                player.setVotes(null);
+                playerRepository.updateFullPlayer(player);
+            }
+            lobby.setPlayersList(players);
+            LobbyStorage.getInstance().setLobby(lobby);
+        }
     }
 
     private WinStatus checkWinner(List<Player> players) {
@@ -544,7 +567,7 @@ public class LobbyService {
         }
 
         if (aliveVotes == aliveMafiaPlayersCount) {
-            killPlayerAndCheckWinner(mafiaGame, players);
+            killPlayerAndCheckWinner(mafiaGame, players, number);
             mafiaGame.setPhase(Phase.SHERIFF);
 
             for (Player player1 : players) {
