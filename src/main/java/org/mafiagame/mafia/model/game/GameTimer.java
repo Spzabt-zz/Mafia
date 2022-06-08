@@ -13,11 +13,13 @@ public class GameTimer {
     private boolean speechIsWorking = false;
     private boolean votingIsWorking = false;
     private boolean mafiaIsWorking = false;
+    private boolean sheriffIsWorking = false;
     private boolean isAheadOfSchedule;
     private final Timer startTimer;
     private final Timer speechTimer;
     private final Timer voteTimer;
     private final Timer mafiaTimer;
+    private final Timer sheriffTimer;
 
     public GameTimer(int gameNumber, boolean isAheadOfSchedule) {
         this.gameNumber = gameNumber;
@@ -26,6 +28,7 @@ public class GameTimer {
         speechTimer = new Timer();
         voteTimer = new Timer();
         mafiaTimer = new Timer();
+        sheriffTimer = new Timer();
     }
 
     private final TimerTask timerTaskSeeYourRoles = new TimerTask() {
@@ -37,7 +40,7 @@ public class GameTimer {
             startGameIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setStartGameTimerIsWorking(startGameIsWorking);
-            if (seconds >= 10) {
+            if (seconds >= 20) {
                 startGameIsWorking = false;
                 mafiaGame.setStartGameTimerIsWorking(startGameIsWorking);
                 //oneMinute = 60;
@@ -86,7 +89,7 @@ public class GameTimer {
             votingIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setTimerForDayVotingIsWorking(votingIsWorking);
-            if (seconds >= 180 || mafiaGame.getGameTimer().isAheadOfSchedule()) {
+            if (seconds >= 20 || mafiaGame.getGameTimer().isAheadOfSchedule()) {
                 votingIsWorking = false;
                 mafiaGame.setTimerForDayVotingIsWorking(votingIsWorking);
                 voteTimer.cancel();
@@ -109,7 +112,7 @@ public class GameTimer {
             mafiaIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
             mafiaGame.setTimerForNightMafiaVotingIsWorking(mafiaIsWorking);
-            if (seconds >= 180 || mafiaGame.getGameTimer().isAheadOfSchedule()) {
+            if (seconds >= 20 || mafiaGame.getGameTimer().isAheadOfSchedule()) {
                 mafiaIsWorking = false;
                 mafiaGame.setTimerForNightMafiaVotingIsWorking(mafiaIsWorking);
                 mafiaTimer.cancel();
@@ -121,6 +124,29 @@ public class GameTimer {
 
     public void startTimerForMafiaTurn() {
         mafiaTimer.scheduleAtFixedRate(timerTaskMafiaTurn, 0, 1000);
+    }
+
+    private final TimerTask timerTaskSheriffTurn = new TimerTask() {
+        int seconds = 0;
+
+        @Override
+        public void run() {
+            seconds++;
+            sheriffIsWorking = true;
+            MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
+            mafiaGame.setTimerForSheriffCheckingIsWorking(sheriffIsWorking);
+            if (seconds >= 20 || mafiaGame.getGameTimer().isAheadOfSchedule()) {
+                sheriffIsWorking = false;
+                mafiaGame.setTimerForSheriffCheckingIsWorking(sheriffIsWorking);
+                sheriffTimer.cancel();
+                sheriffTimer.purge();
+            }
+            GameStorage.getInstance().setGame(mafiaGame, gameNumber);
+        }
+    };
+
+    public void startTimerForSheriffTurn() {
+        sheriffTimer.scheduleAtFixedRate(timerTaskSheriffTurn, 0, 1000);
     }
 
     public TimerTask getTimerTaskSpeech() {
