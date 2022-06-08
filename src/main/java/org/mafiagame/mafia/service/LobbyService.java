@@ -479,12 +479,13 @@ public class LobbyService {
         GameTimer gameTimer = mafiaGame.getGameTimer();
         List<Player> players = mafiaGame.getPlayers();
 
-        if (gameTimer.isStartGameIsWorking()) {
+        /*if (gameTimer.isStartGameIsWorking()) {
             throw new InvalidGameException("Wait till players finish their card research");
         }
         if (mafiaGame.getTimerForSpeechIsWorking()) {
             throw new InvalidGameException("Wait till player " + mafiaGame.getCurrentPlayer() + " finish his speech");
-        }
+        }*/
+        //if (!gameTimer.isStartGameIsWorking())
         if (!gameTimer.isStartGameIsWorking()) {
             if (!mafiaGame.getTimerForSpeechIsWorking()) {
                 Player player = players.get(mafiaGame.getCurrentPlayer() - 1);
@@ -882,9 +883,20 @@ public class LobbyService {
     public void deleteLobby(Integer id) {
         Lobby currLobby = lobbyRepository.selectCurrentLobbyByPlayerLobbyId(id);
         Map<Integer, Lobby> lobbyMap = LobbyStorage.getInstance().getLobby();
-        lobbyMap.remove(currLobby.getNumber());
-        LobbyStorage.getInstance().setLobbies(lobbyMap);
-        playerRepository.deleteByLobbyId(id);
-        lobbyRepository.delete(id);
+        if (Objects.equals(currLobby.getGameStatus(), GameStatus.NEW.toString())) {
+            lobbyMap.remove(currLobby.getNumber());
+            LobbyStorage.getInstance().setLobbies(lobbyMap);
+            playerRepository.deleteByLobbyId(id);
+            lobbyRepository.delete(id);
+        } else if (Objects.equals(currLobby.getGameStatus(), GameStatus.FINISHED.toString())) {
+            for (Player player : lobbyMap.get(currLobby.getNumber()).getPlayers()) {
+                votesRepository.delete(player.getId());
+            }
+            lobbyMap.remove(currLobby.getNumber());
+            LobbyStorage.getInstance().setLobbies(lobbyMap);
+
+            playerRepository.deleteByLobbyId(id);
+            lobbyRepository.delete(id);
+        }
     }
 }
