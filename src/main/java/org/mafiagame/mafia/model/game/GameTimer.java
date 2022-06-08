@@ -12,10 +12,12 @@ public class GameTimer {
     private boolean startGameIsWorking = false;
     private boolean speechIsWorking = false;
     private boolean votingIsWorking = false;
+    private boolean mafiaIsWorking = false;
     private boolean isAheadOfSchedule;
     private final Timer startTimer;
     private final Timer speechTimer;
     private final Timer voteTimer;
+    private final Timer mafiaTimer;
 
     public GameTimer(int gameNumber, boolean isAheadOfSchedule) {
         this.gameNumber = gameNumber;
@@ -23,6 +25,7 @@ public class GameTimer {
         startTimer = new Timer();
         speechTimer = new Timer();
         voteTimer = new Timer();
+        mafiaTimer = new Timer();
     }
 
     private final TimerTask timerTaskSeeYourRoles = new TimerTask() {
@@ -33,14 +36,15 @@ public class GameTimer {
             seconds++;
             startGameIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
-            mafiaGame.setTimerIsWorking(startGameIsWorking);
+            mafiaGame.setStartGameTimerIsWorking(startGameIsWorking);
             if (seconds >= 10) {
                 startGameIsWorking = false;
-                mafiaGame.setTimerIsWorking(startGameIsWorking);
+                mafiaGame.setStartGameTimerIsWorking(startGameIsWorking);
                 //oneMinute = 60;
                 startTimer.cancel();
                 startTimer.purge();
             }
+            GameStorage.getInstance().setGame(mafiaGame, gameNumber);
         }
     };
 
@@ -57,14 +61,15 @@ public class GameTimer {
             seconds++;
             speechIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
-            mafiaGame.setTimerIsWorking(speechIsWorking);
+            mafiaGame.setTimerForSpeechIsWorking(speechIsWorking);
             if (seconds >= oneMinute || mafiaGame.getGameTimer().isAheadOfSchedule()) {
                 speechIsWorking = false;
-                mafiaGame.setTimerIsWorking(speechIsWorking);
+                mafiaGame.setTimerForSpeechIsWorking(speechIsWorking);
                 //oneMinute = 60;
                 speechTimer.cancel();
                 startTimer.purge();
             }
+            GameStorage.getInstance().setGame(mafiaGame, gameNumber);
         }
     };
 
@@ -80,18 +85,54 @@ public class GameTimer {
             seconds++;
             votingIsWorking = true;
             MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
-            mafiaGame.setTimerIsWorking(votingIsWorking);
-            if (seconds >= oneMinute || mafiaGame.getGameTimer().isAheadOfSchedule()) {
+            mafiaGame.setTimerForDayVotingIsWorking(votingIsWorking);
+            if (seconds >= 180 || mafiaGame.getGameTimer().isAheadOfSchedule()) {
                 votingIsWorking = false;
-                mafiaGame.setTimerIsWorking(votingIsWorking);
+                mafiaGame.setTimerForDayVotingIsWorking(votingIsWorking);
                 voteTimer.cancel();
                 voteTimer.purge();
             }
+            GameStorage.getInstance().setGame(mafiaGame, gameNumber);
         }
     };
 
     public void startTimerForVoting() {
         voteTimer.scheduleAtFixedRate(timerTaskVoting, 0, 1000);
+    }
+
+    private final TimerTask timerTaskMafiaTurn = new TimerTask() {
+        int seconds = 0;
+
+        @Override
+        public void run() {
+            seconds++;
+            mafiaIsWorking = true;
+            MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(gameNumber);
+            mafiaGame.setTimerForNightMafiaVotingIsWorking(mafiaIsWorking);
+            if (seconds >= 180 || mafiaGame.getGameTimer().isAheadOfSchedule()) {
+                mafiaIsWorking = false;
+                mafiaGame.setTimerForNightMafiaVotingIsWorking(mafiaIsWorking);
+                mafiaTimer.cancel();
+                mafiaTimer.purge();
+            }
+            GameStorage.getInstance().setGame(mafiaGame, gameNumber);
+        }
+    };
+
+    public void startTimerForMafiaTurn() {
+        mafiaTimer.scheduleAtFixedRate(timerTaskMafiaTurn, 0, 1000);
+    }
+
+    public TimerTask getTimerTaskSpeech() {
+        return timerTaskSpeech;
+    }
+
+    public TimerTask getTimerTaskVoting() {
+        return timerTaskVoting;
+    }
+
+    public TimerTask getTimerTaskMafiaTurn() {
+        return timerTaskMafiaTurn;
     }
 
     public boolean isStartGameIsWorking() {

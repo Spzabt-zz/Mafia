@@ -17,7 +17,13 @@ public class MafiaGame {
     private Integer currentPlayer;
     private List<Player> players;
     private WinStatus winStatus;
-    private Boolean timerIsWorking;
+
+    private Boolean startGameTimerIsWorking;
+    private Boolean TimerForSpeechIsWorking;
+    private Boolean TimerForDayVotingIsWorking;
+    private Boolean TimerForNightMafiaVotingIsWorking;
+    private Boolean TimerForSheriffCheckingIsWorking;
+
     private Boolean playerIsMafia;
 
     @JsonIgnore

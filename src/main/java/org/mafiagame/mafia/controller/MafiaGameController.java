@@ -60,8 +60,8 @@ public class MafiaGameController {
 
     @PostMapping("/lobby/{number}/candidates")
     public ResponseEntity<MafiaGame> candidateNomination(@PathVariable Integer number,
-                                                         @RequestParam("player_position") Integer player_position) throws InvalidGameException {
-        MafiaGame mafiaGame = lobbyService.civilianVoting(number, player_position);
+                                                         @RequestParam(value = "player_position", required = false) Integer player_position) throws InvalidGameException, InterruptedException {
+        MafiaGame mafiaGame = lobbyService./*civilianVoting*/dayVoting(number, player_position);
         webSocket.convertAndSend("/topic/game-progress/" + number, mafiaGame);
         log.info("Candidate nominated by number: {}", number);
         return ResponseEntity.ok(mafiaGame);
@@ -69,8 +69,8 @@ public class MafiaGameController {
 
     @PostMapping("/lobby/{number}/mafia_turn")
     public ResponseEntity<MafiaGame> mafiaNomination(@PathVariable Integer number,
-                                                         @RequestParam("player_position") Integer player_position) throws InvalidGameException {
-        MafiaGame mafiaGame = lobbyService.mafiaTurn(number, player_position);
+                                                         @RequestParam("player_position") Integer player_position) throws InvalidGameException, InterruptedException {
+        MafiaGame mafiaGame = lobbyService./*mafiaTurn*/nightMafiaVoting(number, player_position);
         webSocket.convertAndSend("/topic/game-progress/" + number, mafiaGame);
         log.info("Mafia nominated by number: {}", number);
         return ResponseEntity.ok(mafiaGame);
