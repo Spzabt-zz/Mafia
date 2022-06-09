@@ -479,13 +479,6 @@ public class LobbyService {
         GameTimer gameTimer = mafiaGame.getGameTimer();
         List<Player> players = mafiaGame.getPlayers();
 
-        /*if (gameTimer.isStartGameIsWorking()) {
-            throw new InvalidGameException("Wait till players finish their card research");
-        }
-        if (mafiaGame.getTimerForSpeechIsWorking()) {
-            throw new InvalidGameException("Wait till player " + mafiaGame.getCurrentPlayer() + " finish his speech");
-        }*/
-        //if (!gameTimer.isStartGameIsWorking())
         if (!gameTimer.isStartGameIsWorking()) {
             if (!mafiaGame.getTimerForSpeechIsWorking()) {
                 Player player = players.get(mafiaGame.getCurrentPlayer() - 1);
@@ -666,10 +659,10 @@ public class LobbyService {
                 }
             }
         }
-        if (!mafiaGame.getTimerForNightMafiaVotingIsWorking() && !mafiaGame.getIsLastPlayer()) {
+        /*if (!mafiaGame.getTimerForNightMafiaVotingIsWorking() && !mafiaGame.getIsLastPlayer()) {
             mafiaGame.setGameTimer(new GameTimer(number, false));
             gameTimer.startTimerForMafiaTurn();
-        }
+        }*/
         if (mafiaGame.getPhase() == Phase.SHERIFF) {
             abstainVote(number);
             Thread.sleep(1000);
