@@ -364,7 +364,7 @@ public class LobbyService {
         }
         if (mafiaGame.getPhase() == Phase.MAFIA) {
             abstainVote(number);
-            Thread.sleep(1000);
+            Thread.sleep(1100);
             mafiaGame.setGameTimer(new GameTimer(number, false));
             gameTimer.startTimerForMafiaTurn();
         }
@@ -474,7 +474,7 @@ public class LobbyService {
         return null;
     }
 
-    public MafiaGame speech(Integer number) throws InvalidGameException {
+    public MafiaGame speech(Integer number) throws InvalidGameException, InterruptedException {
         MafiaGame mafiaGame = GameStorage.getInstance().getMafiaGame(number);
         GameTimer gameTimer = mafiaGame.getGameTimer();
         List<Player> players = mafiaGame.getPlayers();
@@ -521,6 +521,8 @@ public class LobbyService {
                             }
                         }
 
+                        abstainVote(number);
+                        Thread.sleep(1100);
                         mafiaGame.setGameTimer(new GameTimer(number, false));
                         gameTimer.startTimerForVoting();
 
@@ -619,6 +621,12 @@ public class LobbyService {
                         mafiaGame.setDayTime(DayTime.DAY);
                         mafiaGame.setDay(mafiaGame.getDay() + 1);
                         mafiaGame.setPhase(Phase.SPEECH);
+
+                        abstainVote(number);
+                        Thread.sleep(1100);
+                        mafiaGame.setGameTimer(new GameTimer(number, false));
+                        gameTimer.startTimerForSpeech();
+
                         findCurrentPlayer(player1, players, mafiaGame);
                         break;
                     }
@@ -652,6 +660,12 @@ public class LobbyService {
                             mafiaGame.setDayTime(DayTime.DAY);
                             mafiaGame.setDay(mafiaGame.getDay() + 1);
                             mafiaGame.setPhase(Phase.SPEECH);
+
+                            abstainVote(number);
+                            Thread.sleep(1100);
+                            mafiaGame.setGameTimer(new GameTimer(number, false));
+                            gameTimer.startTimerForSpeech();
+
                             findCurrentPlayer(player1, players, mafiaGame);
                             break;
                         }
@@ -665,7 +679,7 @@ public class LobbyService {
         }*/
         if (mafiaGame.getPhase() == Phase.SHERIFF) {
             abstainVote(number);
-            Thread.sleep(1000);
+            Thread.sleep(1100);
             mafiaGame.setGameTimer(new GameTimer(number, false));
             gameTimer.startTimerForSheriffTurn();
         }
@@ -723,7 +737,7 @@ public class LobbyService {
 
         if (mafiaGame.getPhase() == Phase.SPEECH) {
             abstainVote(number);
-            Thread.sleep(1000);
+            Thread.sleep(1100);
             mafiaGame.setGameTimer(new GameTimer(number, false));
             gameTimer.startTimerForSpeech();
         }

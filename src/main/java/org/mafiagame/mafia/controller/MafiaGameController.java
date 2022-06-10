@@ -38,7 +38,7 @@ public class MafiaGameController {
     }
 
     @PostMapping("/lobby/{number}/speech")
-    public ResponseEntity<MafiaGame> gameSpeech(@PathVariable Integer number) throws InvalidGameException {
+    public ResponseEntity<MafiaGame> gameSpeech(@PathVariable Integer number) throws InvalidGameException, InterruptedException {
         MafiaGame mafiaGame = lobbyService.speech(number);
         log.info("Candidate is speaking by number: {}", number);
         return ResponseEntity.ok(mafiaGame);
