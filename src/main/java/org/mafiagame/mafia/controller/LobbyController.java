@@ -41,8 +41,7 @@ public class LobbyController {
     public ResponseEntity<Lobby> addLobby(@RequestBody CreateLobbyRequest createLobbyRequest) throws InvalidLobbyNumberException, InvalidPlayerNameException {
         log.info("Lobby created: {}", createLobbyRequest);
         Lobby lobby = lobbyService.createGameLobby(createLobbyRequest);
-        //webSocket.convertAndSend("/topic/lobby-stuff", lobby);
-        return ResponseEntity.ok(/*lobbyService.createGameLobby(createLobbyRequest)*/lobby);
+        return ResponseEntity.ok(lobby);
     }
 
     @GetMapping("/lobby")
@@ -55,8 +54,7 @@ public class LobbyController {
     public ResponseEntity<Player> connectUserToLobby(@RequestBody ConnectRequest connectRequest, @PathVariable Integer number) throws InvalidLobbyException, InvalidPlayerNameException, InvalidLobbySizeException {
         log.info("Connect player to lobby: connect req {}, number {}", connectRequest, number);
         Player player = lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number);
-        //webSocket.convertAndSend("/topic/lobby-stuff/" + number, player);
-        return ResponseEntity.ok(/*lobbyService.connectUserToLobby(connectRequest.getPlayerName(), number)*/player);
+        return ResponseEntity.ok(player);
     }
 
     @GetMapping("/lobby/{number}/players")

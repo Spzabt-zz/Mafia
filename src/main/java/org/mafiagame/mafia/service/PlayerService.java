@@ -24,14 +24,6 @@ public class PlayerService {
         this.votesRepository = votesRepository;
     }
 
-    public void addPlayer(Player player) {
-         playerRepository.add(player);
-    }
-
-    public List<Player> getPlayers() {
-         return playerRepository.players();
-    }
-
     public void deletePlayer(Integer id) {
         Player currPlayer = playerRepository.selectCurrentPlayerById(id);
         Lobby currLobby = lobbyRepository.selectCurrentLobbyByPlayerLobbyId(currPlayer.getLobbyId());

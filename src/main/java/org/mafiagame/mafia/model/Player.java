@@ -1,7 +1,5 @@
 package org.mafiagame.mafia.model;
 
-import org.mafiagame.mafia.annotations.Ignore;
-
 import java.util.Objects;
 
 public class Player {
@@ -14,8 +12,6 @@ public class Player {
     private Integer vote;
     private Boolean admin;
     private Integer lobbyId;
-
-    @Ignore
     private Votes votes;
 
     public Player() {
